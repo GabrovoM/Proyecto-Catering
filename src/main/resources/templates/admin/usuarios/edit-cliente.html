@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Editar Cliente</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<div th:insert="~{admin/fragmentos::horizontal-nav}"></div>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+		</div>
+		<div class="col-9 content-area">
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<h2 class="mb-4">Editar Cliente</h2>
+				<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+					<p th:text="${errorMessage}"></p>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+				<form th:action="@{/admin/usuario/update/cliente/{id}(id=${usuario.id})}" method="post">
+					<div class="form-group">
+						<label for="nombre">Nombre y apellidos:</label>
+						<input type="text" class="form-control" id="nombre" name="nombre" th:value="${usuario.nombre}"
+							required>
+					</div>
+
+					<div class="form-group">
+						<label for="username">Username:</label>
+						<input type="text" class="form-control" id="username" name="username"
+							th:value="${usuario.username}" required>
+					</div>
+
+					<div class="form-group">
+						<label for="email">Email:</label>
+						<input type="email" class="form-control" id="email" name="email" th:value="${usuario.email}"
+							required>
+					</div>
+					<div class="form-group">
+						<label for="direccion">Localidad:</label>
+						<input type="text" class="form-control" id="direccion" name="direccion"
+							th:value="${usuario.localidad}">
+					</div>
+					<div class="row mt-3">						
+						<div class="col-12 col-md-6 mb-2">
+							<button type="submit" class="btn btn-primary w-100 btn-edit">Modificar cliente</button>
+						</div>					
+						<div class="col-12 col-md-6 ">
+							<a href="/admin/usuario/role-user" class="btn btn-secondary w-100 btn-edit">Volver sin modificar</a>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
+		</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+</body>
+
+</html>

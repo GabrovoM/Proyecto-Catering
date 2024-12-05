@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Detalles perfil</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<div th:insert="~{admin/fragmentos::horizontal-nav}"></div>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+		</div>
+		<div class="col-9 content-area">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item">
+				<a th:href="@{/admin}">Admin panel</a>
+			</li>
+			<li class="breadcrumb-item active">Perfil</li>
+		</ol>
+		<h2 class="mb-5 text-center">Perfil de usuario</h2>
+		<div class="row">
+			<div class="col-md-2 col-1"></div>
+			<div class="col-md-8 col-10">
+				<p>Nombre: <span th:text="${nombre}"></span></p>				
+				<p>Localidad: <span th:text="${localidad}"></span></p>
+				<p>Email: <span th:text="${email}"></span></p>
+				<p>Username: <span th:text="${username}"></span></p>
+				<div class="text-end mt-3">
+					<a th:href="@{/modificarUsuario/{id}(id=${id})}" class="btn btn-primary">Modificar</a>
+					<a th:href="@{/admin}" class="btn btn-primary">Volver</a>
+				</div>
+			</div>
+			<div class="col-md-2 col-1"></div>
+		</div>
+	</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+
+</body>
+</html>

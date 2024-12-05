@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Acceso Denegado</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+</head> 
+<body>
+	<div class="row mt-5">
+		<div class="col-3"></div>
+		<div class="col-6 text-center">
+			<img src="/img/error403.png" alt="Imagen página acceso denegado" style="width:80%"/>
+		    <h3 th:if="${message != null}" th:utext="${message}" style="color: red;"></h3>				
+			<div class="mt-5">
+				<a th:if="${userRole == 'ROLE_USER'}" th:href="@{/}" class="btn btn-custom-dark">Volver</a>
+			    <a th:if="${userRole == 'ROLE_GESTOR' || userRole == 'ROLE_EDITOR'}" th:href="@{/admin}" class="btn btn-custom-primary">Volver</a>
+		    </div>
+	    </div>
+	    <div class="col-3"></div>
+    </div>     
+    
+     <script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+</body> 
+</html>

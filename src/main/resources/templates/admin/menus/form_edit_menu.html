@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Editar Menu</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">	
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">	
+</head>
+<body id="page-top">
+	<div class="container mb-4">
+		<h1 class="text-center mb-5">Gestión de contenidos</h1>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item ">
+				<a th:href="@{/admin}">Panel principal</a>
+			</li>
+			<li class="breadcrumb-item" sec:authorize="hasRole('ADMIN') or hasRole('EDITOR')">			
+				<a th:if="${nombre != null}" th:href="@{'/admin/menus?nombre=' + ${nombre}}">Menús</a>			
+				<a th:if="${nombre == null}" th:href="@{'/admin/menus?page=' + ${page}}">Menús</a>
+			</li>
+			<li class="breadcrumb-item active">Editar menú</li>
+		</ol>
+		<h2>Editar menú</h2>		
+		<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+			<p th:text="${errorMessage}"></p>
+			 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		<form th:action="@{/admin/menus/updatemenu}" th:object="${menuEdit}" id="form-menu" method="post">
+			<input type="hidden" name="returnPage" value="form_edit" />
+			<input type="hidden" th:field="*{id}" id="id" />
+			<div class="form-group">
+				<div class="row">
+					<div class="col-sm-2">
+						<label class="control-label col-sm-2" for="nombre"><strong>Nombre:</strong></label>
+					</div>					
+					<div class="col-sm-7">
+						<input type="text" class="form-control" id="nombre" name="nombre" th:field="*{nombre}"
+							placeholder="Ingrese el nombre del menú" autocomplete="off" required>
+					</div>
+					<div class="col-sm-3 mb-4">
+						<button type="button" class="btn btn-custom-success" name="addItem" id="add-day">Añadir día</button>
+					</div>
+				</div>
+			</div>
+			<fieldset id="dias">			   
+			    <div th:each="entry : ${groupedByDia}" class="form-day">
+			        <h2>Día: <span th:text="${entry.key}"></span></h2>  			     
+			        <div th:each="menuPlato : ${entry.value}">			
+			            <div class="form-group">
+			                <select th:if="${menuPlato.orden==1}" class="form-control"
+			                    th:id="|numerodia_${menuPlato.id}|" th:name="|dias[${menuPlato.dia}].numerodia|"
+			                    style="display:none">
+			                    <option th:value="1" th:selected="${menuPlato.dia == 1}">1</option>
+			                    <option th:value="2" th:selected="${menuPlato.dia == 2}">2</option>
+			                    <option th:value="3" th:selected="${menuPlato.dia == 3}">3</option>
+			                    <option th:value="4" th:selected="${menuPlato.dia == 4}">4</option>
+			                    <option th:value="5" th:selected="${menuPlato.dia == 5}">5</option>
+			                    <option th:value="6" th:selected="${menuPlato.dia == 6}">6</option>
+			                    <option th:value="7" th:selected="${menuPlato.dia == 7}">7</option>
+			                </select>
+			            </div>				
+						<div class="row">							
+							<div class="col-12 d-flex justify-content-end align-items-center mb-2 d-md-none">
+								<a th:if="${menuPlato.orden==1}"
+									th:href="@{/admin/menus/borrar/{idmp}(idmp=${menuPlato.id})}"
+									class="btn btn-danger">
+									Borrar
+								</a>
+							</div>						
+							<div class="col-md-8">
+								<div class="form-group mb-2" id="info-dia">
+									<label th:if="${menuPlato.orden == 1}" th:for="|platos1_${menuPlato.id}|">
+										<mark><strong>1º </strong></mark>
+									</label>
+									<label th:if="${menuPlato.orden == 2}" th:for="|platos2_${menuPlato.id}|">
+										<mark><strong>2º </strong></mark>
+									</label>
+										<input type="text" class="form-control"
+										    th:id="|platos${menuPlato.orden}_${menuPlato.id}|"
+										    th:name="|dias[${menuPlato.dia}].platos${menuPlato.orden}|"
+										    th:value="${menuPlato.plato.id}" 
+										    th:text="${menuPlato.plato.nombre + (menuPlato.plato.noDisponible ? ' (No disp.)' : '')}" required
+										    style="display:none" />
+									<a th:href="@{/admin/menus/cambiarplato/{menuId}/{platoId}(
+									                menuId=${menuEdit.id}, 
+									                platoId=${menuPlato.plato.id}, 
+									                returnUrl='editMenu', 
+									                dia=${menuPlato.dia})}"
+									   				class="btn btn-custom-warning btn-sm">
+									   				Cambiar Plato
+									</a>	
+								</div>
+							</div>							
+							<div class="col-md-4 d-flex justify-content-end align-items-center d-none d-md-flex">
+								<a th:if="${menuPlato.orden==1}"
+									th:href="@{/admin/menus/borrar/{idmp}(idmp=${menuPlato.id})}"
+									class="btn btn-danger btn-sm">
+									Borrar
+								</a>
+							</div>
+						</div>			            
+			        </div>					        		        
+			    </div>
+			</fieldset>    
+			<div class="row mt-4">
+				    <div class="col-xs-12 col-md-2 inline-buttons">
+				        <button type="submit" class="btn btn-success">
+				            <span class="glyphicon glyphicon-saved"></span> Guardar
+				        </button>
+				        <a th:href="@{/admin/menus}" class="btn btn-success">Volver</a>
+				    </div>
+				</div>
+		</form>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+		
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		const platosList = /*[[${platosLista}]]*/[];
+		const categoriasList = /*[[${categoriasLista}]]*/[];
+
+		console.log('Platos List:', platosList);
+		console.log('Categorias List:', categoriasList);
+		/*]]>*/
+	</script>
+
+	<script>
+		$(document).ready(function () {
+	    let dayCounter = $('.form-day').length; 
+	    let platosList = [];
+	
+	    function fetchPlatosList() {
+	        $.ajax({
+	            url: '/platos/list',
+	            method: 'GET',
+	            success: function (data) {
+	                platosList = data;
+	            },
+	            error: function (error) {
+	                console.error('Error fetching platos list:', error);
+	            }
+	        });
+	    }    
+    
+	    function populatePlatosSelect(selectElement, orden) {
+		    $(selectElement).empty(); 
+		    $(selectElement).append('<option selected disabled>---Selecciona una opción---</option>');
+		
+		    categoriasList.forEach(function (categoria) {
+		        const optgroup = $('<optgroup></optgroup>').attr('label', categoria.nombre);		       
+		        const platosByCategory = categoria.platos.filter(function (plato) {
+		            return plato.orden === orden && plato.id !== 0; // no mostrar plato con id=0
+		        });		
+		        platosByCategory.forEach(function (plato) {
+		            const formattedPrice = (plato.precio).toFixed(2);
+		            const priceWithCurrency = `${formattedPrice} €`;     		            
+							            
+	            let optionText = `${plato.nombre} - ${priceWithCurrency}`;										
+				if (plato.precio_of !== null && plato.precio_of !== undefined && plato.precio_of > 0) {				  
+				    const formattedOfferPrice = (plato.precio_of).toFixed(2);
+				    const offerPriceWithCurrency = `${formattedOfferPrice} €`;				
+				    optionText += ` (Oferta: ${offerPriceWithCurrency})`;
+				}									
+																	
+				const option = $('<option></option>')
+	                .attr('value', plato.id)
+	                .attr('title', optionText)
+	                .text(optionText);					
+						           
+	            if (plato.noDisponible) {
+	                option.attr('disabled', 'disabled');
+	                option.css('color', 'gray'); 
+	            }	
+	            optgroup.append(option);	            
+	        });	      
+	        if (platosByCategory.length > 0) {
+	            $(selectElement).append(optgroup);
+	        }
+	    });
+		}
+							
+		function getSelectedDays() {		  
+		    const existingDays = $('select[name*=".numerodia"]').map(function () {
+		        return $(this).val();
+		    }).get(); 		
+		    const newDays = $('.new-form-day select[name*=".numerodia"]').map(function () {
+		        return $(this).val();
+		    }).get(); 
+		    return Array.from(new Set([...existingDays, ...newDays]));
+		}
+	    function updateDayOptions(newDaySelect) {
+	        const selectedDays = getSelectedDays();
+	        $(newDaySelect).empty(); 
+	        $(newDaySelect).append('<option value="" disabled selected>---Selecciona un día---</option>');	        
+	        for (let i = 1; i <= 7; i++) {
+	            if (!selectedDays.includes(i.toString())) {
+	                $(newDaySelect).append(`<option value="${i}">${i}</option>`);
+	            }
+	        }
+	    }
+     
+		function addDay() {   
+		    const selectedDays = getSelectedDays();
+		    let nextAvailableDay = 1; 
+		    while (nextAvailableDay <= 7) {       
+		        if (!selectedDays.includes(nextAvailableDay.toString())) {
+		            break;
+		        }
+		        nextAvailableDay++; 
+		    }		   
+		    if (nextAvailableDay > 7) {
+		        Swal.fire({
+		            icon: 'warning',
+		            title: 'Límite alcanzado',
+		            text: 'No se pueden añadir más de 7 días al menú.',
+		            confirmButtonText: 'Aceptar'
+		        });
+		        return; 
+		    }		   
+		    const dayTemplate = `
+		        <div class="new-form-day" id="day-${nextAvailableDay}">
+		            <div class="form-group">
+		                <label class="control-label col-sm-2" for="numerodia_${nextAvailableDay}">Día</label>
+		                <select class="form-control" id="numerodia_${nextAvailableDay}" name="dias[${nextAvailableDay}].numerodia" required>
+		                    <option value="${nextAvailableDay}" selected>${nextAvailableDay}</option>
+		                </select>
+		            </div>
+		            <div class="form-group">
+		                <label for="platos1_${nextAvailableDay}">Primer plato</label>
+		                <select class="form-control" id="platos1_${nextAvailableDay}" name="dias[${nextAvailableDay}].platos1" required>
+		                    <option value="">Selecciona un plato</option> 
+		                </select>
+		            </div>
+		            <div class="form-group">
+		                <label for="platos2_${nextAvailableDay}">Segundo plato</label>
+		                <select class="form-control" id="platos2_${nextAvailableDay}" name="dias[${nextAvailableDay}].platos2" required>
+		                    <option value="">Selecciona un plato</option> 
+		                </select>
+		            </div>
+		            <div class="error-message text-danger" id="error-day-${nextAvailableDay}" style="display:none;">
+		                <!-- Error message will be shown here -->
+		            </div>
+		            <button type="button" class="btn btn-danger remove-day" data-day-id="${nextAvailableDay}">Eliminar día</button>
+		        </div>`;
+		
+		    $('#dias').append(dayTemplate);		   
+		    populatePlatosSelect(`#platos1_${nextAvailableDay}`, 1); 
+		    populatePlatosSelect(`#platos2_${nextAvailableDay}`, 2); 
+		} 
+	   
+	    $(document).on('click', '.remove-day', function() {
+		        const dayId = $(this).data('day-id'); 
+		        $(`#day-${dayId}`).remove(); 	      
+		        dayCounter = $('.form-day').length; 	
+		        updateDayOptions();
+		    });		   
+		    $('#add-day').click(function () {
+		        addDay();
+		    });				  
+		    $('.form-day').each(function (index) {
+		        populatePlatosSelect(`#platos1_${index}`, 1);
+		        populatePlatosSelect(`#platos2_${index}`, 2);
+		    });		   
+		    fetchPlatosList();
+		});  
+	
+		$('#form-menu').on('submit', function(event) {
+		    let isValid = true;  		 
+			$(this).find('.new-form-day').each(function() {				
+		        const plato1 = $(this).find('select[name$=".platos1"]').val();
+		        const plato2 = $(this).find('select[name$=".platos2"]').val();		        					
+				if (plato1==null || plato2==null) {
+					isValid = false;
+					$(this).find('.error-message').text('Debes elegir primero y segundo plato.').show(); 
+							//$('.error-message').text('Debes elegir primero y segundo plato.').show();
+					return false; 
+				} 		    
+		    });		
+		    if (!isValid) {
+		        event.preventDefault();  
+		    }
+		});
+	
+		$(document).on('change', 'select[name$=".platos1"], select[name$=".platos2"]', function() {
+		    const formDay = $(this).closest('.new-form-day'); 
+		    const plato1 = formDay.find('select[name$=".platos1"]').val();
+		    const plato2 = formDay.find('select[name$=".platos2"]').val();			   
+		    if (plato1 !== plato2) {
+		        formDay.find('.error-message').hide();
+		    }
+		});
+	</script>
+	
+</body>
+</html>
+

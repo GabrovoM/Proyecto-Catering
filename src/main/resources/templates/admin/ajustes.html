@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes</title>
+    <link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+<body>
+    <h1 class="text-center mb-5">Gestión de contenidos</h1>
+    <div th:insert="~{admin/fragmentos::horizontal-nav}"></div>   
+    <div class="container-fluid">
+	    <div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+	        <div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+	    </div>
+	    <div class="col-8 content-area">      
+	        <div class="row justify-content-center mb-4">
+	            <h2>Ajustes</h2>
+	        </div>
+            <div class="row justify-content-center">
+                <form action="/admin/ajustes/update-ajustes" method="POST">
+                    <input type="hidden" name="id" th:value="${ajustes[0].id}" />
+                    <table id="tabla-ajustes" class="table table-bordered">
+                        <tr>
+                            <th>Dirección de la empresa (c., av, ...)</th>
+                            <td><input type="text" name="direccionEmpresa" th:value="${ajustes[0].direccionEmpresa != null ? ajustes[0].direccionEmpresa : ''}" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <th>Número</th>
+                            <td><input type="text" name="num" th:value="${ajustes[0].num != null ? ajustes[0].num : ''}" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <th>Piso</th>
+                            <td><input type="text" name="piso" th:value="${ajustes[0].piso != null ? ajustes[0].piso : ''}" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <th>Código postal</th>
+                            <td><input type="text" name="cp" th:value="${ajustes[0].cp != null ? ajustes[0].cp : ''}" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <th>Localidad</th>
+                            <td><input type="text" name="localidad" th:value="${ajustes[0].localidad != null ? ajustes[0].localidad : ''}" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <th>Correo electrónico</th>
+                            <td><input type="text" name="emailEmpresa" th:value="${ajustes[0].emailEmpresa != null ? ajustes[0].emailEmpresa : ''}" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <th>Coste de envío Zona 1</th>
+                            <td><input type="number" name="precioEnvioZona1" id="precioEnvioZona1" th:value="${ajustes[0].precioEnvioZona1 != null ? ajustes[0].precioEnvioZona1 : ''}" class="form-control" min="0" step="0.1"></td>
+                        </tr>
+                        <tr>
+                            <th>Coste de envío Zona 2</th>
+                            <td><input type="number" name="precioEnvioZona2" id="precioEnvioZona2" th:value="${ajustes[0].precioEnvioZona2 != null ? ajustes[0].precioEnvioZona2 : ''}" class="form-control" min="0" step="0.1"></td>
+                        </tr>
+                        <tr>
+                            <th>Numeración de pedidos</th>
+                            <td><input type="text" name="numeracionPedido" th:value="${ajustes[0].numeracionPedido != null ? ajustes[0].numeracionPedido : ''}" class="form-control" pattern="[0-9#,_-]+" title="Only numbers, #, _, and - are allowed"></td>
+                        </tr>
+                    </table>                   
+                    <div class="d-flex justify-content-start mt-3">
+                        <button type="submit" class="btn btn-custom-primary">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+    </div>
+    <div class="col-1"></div>
+    </div>
+    <th:block th:insert="~{public/navigation::footer}"></th:block>
+	 
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+    
+</body>
+</html>

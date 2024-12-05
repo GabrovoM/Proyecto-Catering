@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+	<title>Platos</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+</head>
+<body id="page-top">
+	<header class="jumbotron text-center">
+		<h1 class="display-3 headings mt-5"> Sabores del Momento </h1>
+		<h2 class="lead subtitle">Perfecto para cada ocasión</h2>
+	</header>
+	<div class="container-fluid">
+		<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+		<th:block th:if="${isFavoritesView == null or !isFavoritesView}">
+			<th:block th:insert="~{public/navigation::search-form}"></th:block>
+		</th:block>
+	</div>
+	<div th:if="${message}" class="alert alert-success d-flex justify-content-between align-items-center" role="alert">
+		<span th:text="${message}"></span>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+	<div th:if="${error}" class="alert alert-danger" role="alert">
+		<span th:text="${error}"></span>
+	</div>
+	<h3 th:if="${categoryName != null}" th:text="'Categoría: ' + ${categoryName}" class="cursivaT ms-4"></h3>
+	<div class="container mt-4">
+		<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+			<p th:text="${errorMessage}"></p>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		<div th:if="${isFavoritesView} and (${platos} != null and ${platos.empty})" class="alert alert-info">
+			No tienes favoritos.
+		</div>
+		<div th:if="${isFavoritesView != true && platos != null && platos.empty}" class="alert">
+			<p th:if="${noPlatosInCategory != null && noPlatosInCategory}" class="alert alert-info">No hay platos en
+				esta categoría.</p>
+			<p th:if="${noPlatosInCategory == null || !noPlatosInCategory}" class="alert alert-info">No hay platos
+				disponibles.</p>
+		</div>
+		<div class="row text-center" id="platoslist">
+			<div class="col-lg-3 col-md-6 mt-4 mb-4" th:each="plato: ${platos}" th:if="${plato.id} != 0">
+				<div class="row" sec:authorize="isAuthenticated()">
+					<div class="fav-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+							class="bi bi-heart-fill favme" viewBox="0 0 16 16" th:data-id="${plato.id}"
+							th:classappend="${#sets.contains(favoritos, plato.id) ? 'active' : ''}">
+							<path fill-rule="evenodd"
+								d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" />
+						</svg>
+					</div>
+				</div>
+				<div class="custom-container h-100 border rounded">
+					<a th:href="${idCategoria != null} 
+                    ? @{/platos/{id}(id=${plato.id}, idCategoria=${idCategoria}, page=${platosPage != null ? platosPage.number + 1 : 1}, isFavoritesView=${isFavoritesView})} 
+                    : @{/platos/{id}(id=${plato.id}, page=${platosPage != null ? platosPage.number + 1 : 1}, isFavoritesView=${isFavoritesView})}">
+						<div class="image-wrapper position-relative">
+							<img class="custom-img-top w-100" th:src="@{/images/{img}(img=${plato.imagen})}" alt="Imagen de plato">
+							<div class="overlay-icon d-flex justify-content-center align-items-center">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+									class="bi bi-search" viewBox="0 0 16 16">
+									<path
+										d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+								</svg>
+							</div>
+						</div>
+					</a>
+					<div class="custom-body">
+						<p class="custom-text" th:text="${plato.nombre}"></p>	
+						<p th:if="${plato.precio_of != null && plato.precio_of > 0}">
+							<span class="strikethrough"
+								th:text="${#numbers.formatDecimal(plato.precio, 1, 2) + ' €'}"></span>
+							<span class="discount-price"
+								th:text="${#numbers.formatDecimal(plato.precio_of, 1, 2) + ' €'}"></span>
+						</p>
+						<p th:if="${plato.precio_of == null || plato.precio_of <= 0}" class="custom-text"
+							th:text="${#numbers.formatDecimal(plato.precio, 1, 2) + ' €'}"></p>
+						<p th:if="${plato.noDisponible}" class="text-danger">No disponible</p>
+					</div>
+					<div class="custom-footer"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-3"></div>
+		<!-- Primera paginación -->
+		<div th:if="${platosPage != null and platosPage.totalPages > 1 and nombre == null and favoritePlatosPage == null}"
+			class="col-6 mt-5">
+			<ul class="pagination">
+				<li th:class="${platosPage.number == 0} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number != 0}"
+						th:href="${idCategoria != null} ? @{/platos(idCategoria=${idCategoria}, page=1)} : @{/platos(page=1)}">&laquo;</a>
+					<span th:if="${platosPage.number == 0}">&laquo;</span>
+				</li>
+				<li th:class="${platosPage.number == 0} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number != 0}"
+						th:href="${idCategoria != null} ? @{/platos(idCategoria=${idCategoria}, page=${platosPage.number})} : @{/platos(page=${platosPage.number})}">&larr;</a>
+					<span th:if="${platosPage.number == 0}">&larr;</span>
+				</li>
+				<li th:each="page : ${#numbers.sequence(1, platosPage.totalPages)}"
+					th:class="${platosPage.number + 1 == page} ? 'active pointer-disabled'">
+					<a class="page-link"
+						th:href="${idCategoria != null} ? @{/platos(idCategoria=${idCategoria}, page=${page})} : @{/platos(page=${page})}"
+						th:text="${page}"></a>
+				</li>
+				<li th:class="${platosPage.number + 1 == platosPage.totalPages} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number + 1 != platosPage.totalPages}"
+						th:href="${idCategoria != null} ? @{/platos(idCategoria=${idCategoria}, page=${platosPage.number + 2})} : @{/platos(page=${platosPage.number + 2})}">&rarr;</a>
+					<span th:if="${platosPage.number + 1 == platosPage.totalPages}">&rarr;</span>
+				</li>
+				<li th:class="${platosPage.number + 1 == platosPage.totalPages} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number + 1 != platosPage.totalPages}"
+						th:href="${idCategoria != null} ? @{/platos(idCategoria=${idCategoria}, page=${platosPage.totalPages})} : @{/platos(page=${platosPage.totalPages})}">&raquo;</a>
+					<span th:if="${platosPage.number + 1 == platosPage.totalPages}">&raquo;</span>
+				</li>
+			</ul>
+		</div>
+
+		<!-- Paginación para búsqueda -->
+		<div th:if="${!platos.isEmpty() and nombre != null}" class="col-6 mt-5">
+			<ul class="pagination">
+				<li th:class="${platosPage != null and platosPage.number == 0} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number != 0}"
+						th:href="@{/platos/search(nombre=${nombre != '' ? nombre : null}, page=0, size=${platosPage.size})}">&laquo;</a>
+					<span th:if="${platosPage.number == 0}">&laquo;</span>
+				</li>
+				<li th:class="${platosPage.number == 0} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number != 0}"
+						th:href="@{/platos/search(nombre=${nombre != '' ? nombre : null}, page=${platosPage.number - 1}, size=${platosPage.size})}">&larr;</a>
+					<span th:if="${platosPage.number == 0}">&larr;</span>
+				</li>
+				<li th:each="page : ${#numbers.sequence(1, platosPage.totalPages)}"
+					th:class="${platosPage.number + 1 == page} ? 'active pointer-disabled'">
+					<a class="page-link"
+						th:href="@{/platos/search(nombre=${nombre != '' ? nombre : null}, page=${page - 1}, size=${platosPage.size})}"
+						th:text="${page}"></a>
+				</li>
+				<li th:class="${platosPage.number + 1 == platosPage.totalPages} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number + 1 != platosPage.totalPages}"
+						th:href="@{/platos/search(nombre=${nombre != '' ? nombre : null}, page=${platosPage.number + 1}, size=${platosPage.size})}">&rarr;</a>
+					<span th:if="${platosPage.number + 1 == platosPage.totalPages}">&rarr;</span>
+				</li>
+				<li th:class="${platosPage.number + 1 == platosPage.totalPages} ? 'disabled'">
+					<a class="page-link" th:if="${platosPage.number + 1 != platosPage.totalPages}"
+						th:href="@{/platos/search(nombre=${nombre != '' ? nombre : null}, page=${platosPage.totalPages - 1}, size=${platosPage.size})}">&raquo;</a>
+					<span th:if="${platosPage.number + 1 == platosPage.totalPages}">&raquo;</span>
+				</li>
+			</ul>
+		</div>
+		<div class="col-3"></div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/favs.js}"></script>
+	
+</body>
+</html>

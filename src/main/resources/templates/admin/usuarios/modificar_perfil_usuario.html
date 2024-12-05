@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Editar perfil</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<div th:insert="~{admin/fragmentos::horizontal-nav}"></div>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+		</div>
+		<div class="col-9 content-area">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a th:href="@{/admin}">Admin panel</a>
+				</li>
+				<li class="breadcrumb-item active">
+					<a th:href="@{/admin/editarPerfil}">Perfil</a>
+				</li>
+				<li class="breadcrumb-item active">Modificar</li>
+			</ol>
+			<div class="row mt-5">
+				<div class="col-md-2 col-1"></div>
+				<div class="col-md-8 col-10">
+					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible" role="alert">
+						<p th:text="${errorMessage}"></p>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+					<div>
+						<form th:object="${modificado}" th:action="@{/modificarUsuario/submit}" class="form-perfil" method="post">
+							<input type="hidden" name="id" th:field="*{id}" />
+							<p>Nombre: <input type="text" th:field="*{nombre}" class="form-control" /></p>							
+							<p>Localidad: <input type="text" th:field="*{localidad}" class="form-control" /></p>
+							<p>Email: <input type="text" th:field="*{email}" class="form-control" /></p>
+							<p>Username: <input type="text" th:field="*{username}" class="form-control" /></p>
+							<div id="passwordFields" style="display: none;">
+								<p>Nueva Contraseña: <input type="text" id="newPassword" name="newPassword"
+										class="form-control" autocomplete="new-password" /></p>
+								<p>Confirmar Contraseña: <input type="text" id="confirmPassword" name="confirmPassword"
+										class="form-control" autocomplete="off" /></p>
+							</div>
+							<div class="text-end mt-3">
+								<button type="button" class="btn btn-secondary mb-5" id="togglePasswordButton">Cambiar
+									Contraseña</button>
+								<button type="submit" class="btn btn-primary mb-5">Guardar</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="col-md-2 col-1"></div>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+	<script>
+		document.getElementById("togglePasswordButton").onclick = function () {
+			var passwordFields = document.getElementById("passwordFields");
+			if (passwordFields.style.display === "none") {
+				passwordFields.style.display = "block";
+				this.textContent = "Ocultar Contraseña";
+			} else {
+				passwordFields.style.display = "none";
+				this.textContent = "Cambiar Contraseña";
+			}
+		};
+		document.getElementById('newPassword').addEventListener('focus', function () {
+			this.type = 'password';
+		});
+		document.getElementById('confirmPassword').addEventListener('focus', function () {
+			this.type = 'password';
+		});
+	</script>
+
+</body>
+
+</html>

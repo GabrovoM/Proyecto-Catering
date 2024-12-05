@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Astur Catering</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+</head>
+
+<body id="page-top">
+	<header class="jumbotron text-center">
+		<div class="d-flex justify-content-center align-items-center">
+			<img src="/img/favicon.png" style="width:70px; height: 70px;" id="logo_animacion" class="spin3D" alt="Imagen del logotipo"/>
+			<div class="ms-4">
+				<h1 class="display-3 headings mt-5">Sabores del Momento</h1>
+				<h2 class="lead subtitle">Perfecto para cada ocasión</h2>
+			</div>
+		</div>
+	</header>
+	<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible" role="alert">
+		<p th:text="${errorMessage}"></p>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>	
+	<div class="container-fluid">
+		<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+		<th:block th:if="${isFavoritesView == null or !isFavoritesView} and ${isIndexView == null or !isIndexView}">
+			<th:block th:insert="~{public/navigation::search-form}"></th:block>
+		</th:block>
+	</div>
+	<div th:if="${message}" class="alert alert-success d-flex justify-content-between align-items-center" role="alert">
+		<span th:text="${message}"></span>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+	<div th:if="${error}" class="alert alert-danger" role="alert">
+		<span th:text="${error}"></span>
+	</div>
+	<form th:action="@{/logout}" method="POST" id="logoutForm"></form>
+	<h3 th:if="${categoryName != null}" th:text="'Categoría: ' + ${categoryName}"></h3>
+	<div class="container">
+		<div class="row inicial mt-5">
+			<div class="col-12 col-md-6">
+				<div class="inicio text-center">
+					<p class="texto-inicio">Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar. Cada pedido se elabora al momento, garantizando frescura
+						y sabor para una experiencia práctica y deliciosa, directamente en su mesa.</p>
+					<img src="/img/plato.jpg" alt="Imagen de plato" style="width:80%" />
+					<p><a th:href="@{/platos}" class="btn btn-custom-dark dark-trans mt-3">Descubrir más</a></p>
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class="inicio text-center">
+					<p class="texto-inicio">Ofrecemos menús variados y deliciosos, diseñados especialmente para todos
+						los gustos y ocasiones. Cada plato se elabora con ingredientes frescos y de alta calidad, para
+						que disfrutes de una experiencia sabrosa, casera y sin complicaciones, directamente en la
+						comodidad de tu hogar.</p>
+					<img src="/img/menu1.jpg" alt="Imagen de menú" style="width:80%" />
+					<p><a th:href="@{/menus}" class="btn btn-custom-dark dark-trans mt-3">Descubrir más</a></p>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12">
+				<p>En cada plato encontrarás el equilibrio perfecto entre sabor y frescura, pensado para hacer de cada
+					comida un momento especial en tu hogar. Nos dedicamos a preparar recetas prácticas y deliciosas,
+					elaboradas al momento con ingredientes de calidad y el cuidado que mereces. Ya sea para una ocasión
+					especial o para el día a día, nuestra propuesta combina comodidad y buen gusto, llevándote una
+					experiencia culinaria que disfrutarás en cada bocado.</p>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/favs.js}"></script>
+
+</body>
+
+</html>

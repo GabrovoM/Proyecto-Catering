@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Pago</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+</head>
+<body>
+	<div class="container">
+		<div class="container-fluid">
+			<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+		</div>
+		<div class="row mt-5">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a th:href="@{/platos}">Home</a></li>
+				<li class="breadcrumb-item active">Orden</li>
+			</ol>
+			<th:block th:insert="~{public/navigation::etapas-envio}"></th:block>
+			<div class="card mb-4">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-6">
+							<h5 class="card-title">
+								DIRECCIÓN
+							</h5>
+							<div>
+								<p>Cliente: <span th:text="${cliente}"></span></p>
+								<p>Dirección de entrega: <span th:text="${session.calle}"></span></p>
+								<p>Número: <span th:text="${session.numero}"></span></p>
+								<p>Piso: <span th:text="${session.piso}"></span></p>
+								<p>Código postal: <span th:text="${session.cp}"></span></p>
+								<p>Localidad: <span th:text="${session.localidad}"></span></p>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<p th:if="${fechaPrimerEnvio != null}">
+								La fecha de primer envío es <span
+									th:text="${#temporals.format(fechaPrimerEnvio, 'dd/MM/yyyy')}"></span>
+							</p>
+							<p th:if="${fechaPrimerEnvio == null}">
+								La fecha de entrega es <span
+									th:text="${#temporals.format(fecha_entrega, 'dd/MM/yyyy')}"></span>
+							</p>
+							<div th:unless="${fechaPrimerEnvio}" class="mb-3">
+								<label for="fecha">Elegir otra fecha:</label>
+								<input type="text" class="form-control" id="fecha" name="fecha" size="10" required
+									autocomplete="off" />
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<p>
+							<a th:href="@{/cart/direccion}" class="btn btn-dark button-custom-width"
+								th:if="${!cartEmpty}">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+									class="bi bi-arrow-bar-left" viewBox="0 0 16 16">
+									<path fill-rule="evenodd"
+										d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5" />
+								</svg>
+								Atrás</a>
+						</p>
+						<label>Método de pago</label>
+						<div class="row">
+							<div class="col-6">
+								<form th:action="@{/cart/contrareembolso}" method="post">
+									<input type="hidden" id="total" name="total" th:value="${pedidoTotal+precioEnvio}">
+									<input type="hidden" id="fecha_entrega_contrareembolso" name="fecha_entrega"
+										value="" />
+									<input id="contra_r" type="text" class="form-control" name="contra_r"
+										value="Contrarreembolso" readonly>
+									<button type="submit" id="continuarContraBtn"
+										class="btn btn-dark button-custom-width">
+										Continuar
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+											fill="currentColor" class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
+											<path fill-rule="evenodd"
+												d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8m-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5" />
+										</svg>
+									</button>
+								</form>
+							</div>
+							<div class="col-6">
+								<form th:action="@{/pay}" method="post">
+									<input type="hidden" id="total" name="total" th:value="${pedidoTotal+precioEnvio}">
+									<input type="hidden" id="fecha_entrega_paypal" name="fecha_entrega" value="" />
+									<input id="method" type="text" class="form-control" name="method" value="Paypal"
+										readonly>
+									<input type="image"
+										src="https://www.paypalobjects.com/es_ES/ES/i/btn/btn_buynowCC_LG.gif"
+										name="submit" border="0"
+										alt="Paypal. La forma más rápida y segura de pagar por Internet.">
+								</form>
+							</div>
+						</div>
+						<div class="col-lg-3"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+	<script>
+		$(function () {
+			$("#fecha").datepicker({
+				minDate: 2,
+				dateFormat: 'dd-MM-yy',
+				showButtonPanel: true,
+				closeText: "Cerrar",
+				changeMonth: true,
+				changeYear: true,
+				numberOfMonths: 1,
+				firstDay: 1,
+				dateFormat: "dd-mm-yy",
+				monthNames: [
+					"Enero",
+					"Febrero",
+					"Marzo",
+					"Abril",
+					"Mayo",
+					"Junio",
+					"Julio",
+					"Agosto",
+					"Septiembre",
+					"Octubre",
+					"Noviembre",
+					"Deciembre",
+				],
+				dayNames: [
+					"Domingo",
+					"Lunes",
+					"Martes",
+					"Miércoles",
+					"Jueves",
+					"Viernes",
+					"Sábado",
+				],
+				dayNamesShort: ["Dom", "Lun", "Mar", "Mié", "Juv", "Vie", "Sáb"],
+				dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"],
+				monthNamesShort: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+				yearRange: "2024:2025",
+				nextText: "Siguiente",
+				prevText: "Anterior",
+				beforeShowDay: function (date) {
+					var day = date.getDay();					
+					return [(day != 0), "", ""];
+				},
+				onSelect: function (dateText) {					
+					$('#fecha_entrega_contrareembolso').val(dateText);
+					$('#fecha_entrega_paypal').val(dateText);
+				}
+			});
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">	
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Lista de pedidos</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<style>
+		.pagination .active .page-link {
+			background-color: #007bff;
+			color: white;
+			border-color: #007bff;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="ms-4 mt-5">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a th:href="@{/platos}">Home</a></li>
+			<li class="breadcrumb-item active">Compras</li>
+		</ol>
+	</div>
+	<div class="container-fluid">
+		<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+	</div>
+	<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+		<p th:text="${errorMessage}"></p>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+	<div class="container mt-5">
+		<div class="card mb-4">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="row table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">No. de Orden</th>
+										<th scope="col">Fecha</th>
+										<th scope="col">Total</th>
+										<th scope="col">Estado</th>
+										<th scope="col">Acción</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:if="${pedidos?.empty}">
+										<td colspan="6">No hay pedidos.</td>
+									</tr>
+									<tr th:each="orden: ${pedidos}">
+										<td th:text="${orden.numero}"></td>
+										<td th:text="${#temporals.format(orden.fechaCreacion, 'dd/MM/yyyy')}"></td>
+										<td th:text="${#numbers.formatDecimal(orden.total, 1, 2)} + ' €'"></td>
+										<td th:text="${orden.estadoEnum}"></td>
+										<td>
+											<a th:href="@{/usuario/detalle/{id}(id=${orden.id}, page=${currentPage})}"
+												class="btn btn-custom-success">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+													fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+													<path
+														d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+												</svg>
+											</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="row mt-2" th:if="${hasItems} and ${totalPages > 1}">
+					<nav aria-label="Page navigation">
+						<ul class="pagination justify-content-end">							
+							<li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
+								<a class="page-link" th:href="@{/usuario/compras(page=0, size=${size})}">&laquo;</a>
+							</li>						
+							<li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
+								<a class="page-link"
+									th:href="@{/usuario/compras(page=${currentPage - 1}, size=${size})}">Anterior</a>
+							</li>							
+							<li class="page-item disabled d-none d-sm-block">
+								<span class="page-link">
+									Página <strong th:text="${currentPage + 1}"></strong> de <strong
+										th:text="${totalPages}"></strong>
+								</span>
+							</li>							
+							<li class="page-item" th:class="${currentPage + 1 == totalPages ? 'disabled' : ''}">
+								<a class="page-link"
+									th:href="@{/usuario/compras(page=${currentPage + 1}, size=${size})}">Siguiente</a>
+							</li>							
+							<li class="page-item" th:class="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+								<a class="page-link"
+									th:href="@{/usuario/compras(page=${totalPages - 1}, size=${size})}">&raquo;</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+</body>
+
+</html>

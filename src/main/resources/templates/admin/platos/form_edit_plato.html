@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Editar plato</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+</head>
+<body id="page-top">
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<div th:insert="~{admin/fragmentos::horizontal-nav}"></div>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+		</div>
+		<div class="col-9 content-area">
+			<h2 class="mb-5">Editar plato</h2>
+			<div class="row mb-4">
+				<form th:action="@{/admin/plato/updateplato/submit}" th:object="${editedPlato}" method="post"
+					enctype="multipart/form-data">
+					<div class="row">
+						<input type="hidden" th:field="*{id}" class="form-control" id="id" />
+						<div class="form-group col-md-9">
+							<label class="control-label" for="nombre">Nombre (max. 25 caracteres):</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="nombre" name="nombre" th:field="*{nombre}"
+									pattern="^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]+(?:\s+[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]+)*\s*$" maxlength="40" required autofocus>
+							</div>
+						</div>
+						<div class="form-group col-md-3">
+							<label class="control-label col-sm-2" for="precio">Precio:</label>
+							<div class="col-sm-10">
+								<input type="number" class="form-control" step="any" id="precio" name="precio"
+									th:field="*{precio}" placeholder="Ingrese el precio" autocomplete="off" required>
+							</div>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="form-group col-md-6">
+							<label class="control-label col-sm-2" for="orden">Orden:</label>
+							<div class="col-sm-10">
+								<input type="radio" id="orden1" name="orden" th:field="*{orden}" value="1" required>
+								<label for="orden1">Primero</label>
+								<input type="radio" id="orden2" name="orden" th:field="*{orden}" value="2">
+								<label for="orden2">Segundo</label>
+							</div>
+						</div>
+						<div class="form-group col-md-6">
+							<label class="control-label" for="oferta">Descuento (%):</label>
+							<div>
+								<input type="number" th:field="*{oferta}" class="form-control" id="oferta" th:min="0" />
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label for="categoria">Categoria</label>
+							<select th:field="*{categoria}" class="form-control" id="categoria" name="categoria"
+								required>
+								<option th:each="cat : ${catLista}" th:value="${cat.id}" th:text="${cat.nombre}">
+								</option>
+							</select>
+							<div class="form-check mt-4">
+								<input type="checkbox" th:field="*{noDisponible}" class="form-check-input"
+									id="checkboxField">
+								<label class="form-check-label" for="checkboxField">No disponible</label>
+							</div>
+						</div>
+						<div class="form-group col-md-6">
+							<label for="ingredientes">Ingredientes</label>
+							<select th:field="*{ingredientes}" class="form-control" id="ingredientes"
+								name="ingredientes" size="10" multiple required>
+								<option th:each="ing : ${ingrLista}" th:value="${ing.id}" th:text="${ing.nombre}">
+								</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group mb-4">
+						<label class="control-label col-sm-2" for="img">Imagen:</label>
+						<div class="col-sm-10">
+							<input type="file" class="form-control-file" id="img" name="img">
+						</div>
+					</div>
+					<textarea id="summernote" name="descripcion" th:field="*{descripcion}"></textarea>
+					<div class="row mt-4 mb-5">
+						<div>
+							<button type="submit" class="btn btn-success">
+								<span class="glyphicon glyphicon-saved"></span> Guardar
+							</button>
+							<a th:href="@{/admin/plato}" class="btn btn-success">Volver sin actualizar</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+	<script>
+		$(document).ready(function () {
+			$('#summernote').summernote({
+				tabsize: 2,
+				height: 120,
+				toolbar: [
+					['style', ['style']],
+					['font', ['bold', 'italic', 'underline', 'clear']],
+					['font', ['fontname', 'fontsize']],
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['table', ['table']],
+					['insert', ['link']],
+					['view', ['codeview', 'help']]
+				],
+				styleTags: ['h1', 'h2', 'h3', 'p', 'blockquote', 'pre'],
+			});
+		});
+	</script>
+
+</body>
+</html>

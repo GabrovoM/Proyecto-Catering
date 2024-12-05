@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Añadir ingrediente</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+
+<body id="page-top">
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<div th:insert="~{admin/fragmentos::horizontal-nav}"></div>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+		</div>
+		<div class="col-9 content-area">
+		<h2 class="mb-5">Añadir ingrediente</h2>
+		<div class="row">
+			<form th:action="@{/admin/ingredientes/saveingrediente}" th:object="${nuevoIngr}" method="post" >
+				<div class="form-group mb-5">
+					<label class="control-label col-sm-2" for="nombre">Nombre:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="nombre" name="nombre" th:field="*{nombre}"
+							placeholder="Ingrese el nombre del ingrediente (solo letras)" pattern="^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]+(?:\s+[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]+)*\s*$" autocomplete="on" required autofocus>
+					</div>
+				</div>				
+				<div class="row">
+				    <div class="col-xs-12 col-md-2 inline-buttons">
+				        <button type="submit" class="btn btn-success">
+				            <span class="glyphicon glyphicon-saved"></span> Guardar
+				        </button>
+				        <a th:href="@{/admin/ingredientes}" class="btn btn-success">Volver</a>
+				    </div>
+				</div>
+			</form>
+		</div>		
+		</div>
+	</div>
+	
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+
+</body>
+</html>

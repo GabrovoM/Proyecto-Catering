@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${titulo}">Título</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">	
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>	
+	<th:block th:insert="~{admin/fragmentos::horizontal-nav}"></th:block>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<th:block th:insert="~{admin/fragmentos::vertical-nav}"></th:block>
+		</div>
+		<div class="col-9 content-area">
+			<div class="col-9-content">
+				<div class="row">
+					<div class="col-6">
+						<a th:href="@{/admin/pedidos/download-csv(estado=${estado != null ? estado : null}, 
+				    fechaInicioStr=${fechaInicioStr != null ? fechaInicioStr : null}, 
+				    fechaFinStr=${fechaFinStr != null ? fechaFinStr : null})}" class="btn btn-light border rounded mb-4 "
+							style="padding: 10px;">
+
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+								class="bi bi-filetype-csv" viewBox="0 0 16 16">
+								<path fill-rule="evenodd"
+									d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM3.517 14.841a1.13 1.13 0 0 0 .401.823q.195.162.478.252.284.091.665.091.507 0 .859-.158.354-.158.539-.44.187-.284.187-.656 0-.336-.134-.56a1 1 0 0 0-.375-.357 2 2 0 0 0-.566-.21l-.621-.144a1 1 0 0 1-.404-.176.37.37 0 0 1-.144-.299q0-.234.185-.384.188-.152.512-.152.214 0 .37.068a.6.6 0 0 1 .246.181.56.56 0 0 1 .12.258h.75a1.1 1.1 0 0 0-.2-.566 1.2 1.2 0 0 0-.5-.41 1.8 1.8 0 0 0-.78-.152q-.439 0-.776.15-.337.149-.527.421-.19.273-.19.639 0 .302.122.524.124.223.352.367.228.143.539.213l.618.144q.31.073.463.193a.39.39 0 0 1 .152.326.5.5 0 0 1-.085.29.56.56 0 0 1-.255.193q-.167.07-.413.07-.175 0-.32-.04a.8.8 0 0 1-.248-.115.58.58 0 0 1-.255-.384zM.806 13.693q0-.373.102-.633a.87.87 0 0 1 .302-.399.8.8 0 0 1 .475-.137q.225 0 .398.097a.7.7 0 0 1 .272.26.85.85 0 0 1 .12.381h.765v-.072a1.33 1.33 0 0 0-.466-.964 1.4 1.4 0 0 0-.489-.272 1.8 1.8 0 0 0-.606-.097q-.534 0-.911.223-.375.222-.572.632-.195.41-.196.979v.498q0 .568.193.976.197.407.572.626.375.217.914.217.439 0 .785-.164t.55-.454a1.27 1.27 0 0 0 .226-.674v-.076h-.764a.8.8 0 0 1-.118.363.7.7 0 0 1-.272.25.9.9 0 0 1-.401.087.85.85 0 0 1-.478-.132.83.83 0 0 1-.299-.392 1.7 1.7 0 0 1-.102-.627zm8.239 2.238h-.953l-1.338-3.999h.917l.896 3.138h.038l.888-3.138h.879z" />
+							</svg>
+						</a>
+						<a th:href="@{/admin/pedidos/download-pdf(estado=${estado != null ? estado : null}, 
+				    fechaInicioStr=${fechaInicioStr != null ? fechaInicioStr : null}, 
+				    fechaFinStr=${fechaFinStr != null ? fechaFinStr : null})}" class="btn btn-light border rounded mb-4 "
+							style="padding: 10px;">
+
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+								class="bi bi-filetype-pdf" viewBox="0 0 16 16">
+								<path fill-rule="evenodd"
+									d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM1.6 11.85H0v3.999h.791v-1.342h.803q.43 0 .732-.173.305-.175.463-.474a1.4 1.4 0 0 0 .161-.677q0-.375-.158-.677a1.2 1.2 0 0 0-.46-.477q-.3-.18-.732-.179m.545 1.333a.8.8 0 0 1-.085.38.57.57 0 0 1-.238.241.8.8 0 0 1-.375.082H.788V12.48h.66q.327 0 .512.181.185.183.185.522m1.217-1.333v3.999h1.46q.602 0 .998-.237a1.45 1.45 0 0 0 .595-.689q.196-.45.196-1.084 0-.63-.196-1.075a1.43 1.43 0 0 0-.589-.68q-.396-.234-1.005-.234zm.791.645h.563q.371 0 .609.152a.9.9 0 0 1 .354.454q.118.302.118.753a2.3 2.3 0 0 1-.068.592 1.1 1.1 0 0 1-.196.422.8.8 0 0 1-.334.252 1.3 1.3 0 0 1-.483.082h-.563zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638z" />
+							</svg>
+						</a>
+					</div>
+					<div class="col-6 text-end">
+						<section>
+							<div id="currentDate"></div>
+							<div id="reloj"></div>
+						</section>
+					</div>
+				</div>
+				<form th:action="@{/admin/pedidos/submit}" method="post" onsubmit="return validarFilterPedidos()">
+					<div class="row align-items-end">
+						<div class="col-12 col-md-3 mb-3">
+							<label for="f_ini">Fecha inicio: </label>
+							<input id="f_ini" name="fechaInicioStr" type="date" class="form-control">
+						</div>
+						<div class="col-12 col-md-3 mb-3">
+							<label for="f_fin">Fecha fin: </label>
+							<input id="f_fin" name="fechaFinStr" type="date" class="form-control">
+						</div>
+						<div class="col-12 col-md-4 mb-3">
+							<label for="estado">Estado: </label>
+							<select id="estado" name="estado" class="form-control">
+								<option value="">Selecciona estado</option>
+								<option value="PENDIENTE">PENDIENTE</option>
+								<option value="PARCIAL">PARCIAL</option>
+								<option value="FINALIZADO">FINALIZADO</option>
+								<option value="CANCELADO">CANCELADO</option>
+							</select>
+						</div>
+						<div class="col-12 col-md-2 text-end mb-3">
+							<button type="submit" class="btn btn-dark">Mostrar</button>
+						</div>
+					</div>
+				</form>
+				<div id="error-message" style="color: red; margin-top: 10px;"></div>
+				<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+					<p th:text="${errorMessage}"></p>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>	
+				<div>
+					<p>Con el símbolo <span class="red-circle"></span> están marcados los pedidos con fecha de envío el día siguiente al día actual.</p>
+					<p>Con la fecha en rojo aparecen los pedidos que se deben enviar hoy.</p>
+				</div>			
+				<div class="row mb-2 mt-4">
+					<a th:href="@{/admin/pedidos/fechaEnvio}"
+						th:text="'Parciales (para enviar hoy: '+${#temporals.format(fecha_hoy, 'dd/MM/yyyy')}+')' ">
+						Parciales
+					</a>
+				</div>	
+				<div class="row table-responsive">
+					<table class="table table-hover">
+						<thead class="table-dark bg-info text-white">
+							<tr>
+								<th>Id</th>
+								<th scope="col">Fecha</th>
+								<th scope="col">Número</th>
+								<th scope="col">Cliente</th>
+								<th scope="col">Total</th>
+								<th scope="col">Estado / Fecha prevista</th>
+								<th scope="col">Detalles</th>
+								<th scope="col">Borrar</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${pedidos.empty}">
+								<td colspan="9">No hay pedidos</td>
+							</tr>
+							<tr th:each="pedido : ${pedidos}"
+							    th:class="${dispatchDates1[pedido.id] != null ? 'has-date' : ''}">							
+							    <td><span th:text="${pedido.id}"></span></td>
+							    <td><span th:text="${pedido.fechaCreacion.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy'))}"></span></td>
+							    <td><span th:text="${pedido.numero}"></span></td>
+							    <td><span th:text="${pedido.usuario.nombre}"></span></td>
+							    <td><span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)} + ' €'"></span></td>
+			 				    <td>
+							        <span th:text="${pedido.estadoEnum}" th:class="${(pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PENDIENTE') ? 'pendiente' : 
+							                  (pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL') ? 'parcial' : 
+							                  (pedido.estadoEnum != null && pedido.estadoEnum.name() == 'CANCELADO') ? 'cancelado' : 
+							                  (pedido.estadoEnum != null && pedido.estadoEnum.name() == 'FINALIZADO') ? 'finalizado' : ''}">
+							        </span>	  							       
+							        <span th:if="${pedido.estadoEnum != null and pedido.estadoEnum.name() == 'PENDIENTE'}">
+							            <span th:if="${pedido.fechaEntrega != null}"
+							                  th:text="${#temporals.format(pedido.fechaEntrega, 'dd/MM/yyyy')}"
+							                  th:class="${pedido.fechaEntrega.isEqual(fecha_hoy) ? 'today-dispatch' : ''}"></span>
+							            <span th:if="${pedido.fechaEntrega == null and pedido.getCalculatedFechaEntrega() != null}"
+							                  th:text="${#temporals.format(pedido.getCalculatedFechaEntrega(), 'dd/MM/yyyy')}"
+							                  th:class="${pedido.getCalculatedFechaEntrega().isEqual(fecha_hoy) ? 'today-dispatch' : ''}"></span>
+							        </span>	 							     
+							        <span th:if="${pedido.estadoEnum != null and pedido.estadoEnum.name() == 'PARCIAL'}">							           
+							            <span th:if="${nextDispatchDates[pedido.id] != null}"
+							                  th:text="${#temporals.format(nextDispatchDates[pedido.id], 'dd/MM/yyyy')}"
+							                  th:class="${nextDispatchDates[pedido.id].isEqual(fecha_hoy) ? 'today-dispatch' : ''}"></span>
+							           
+							            <span th:if="${nextDispatchDates[pedido.id] == null and dispatchDates1[pedido.id] != null}"
+							                  th:text="${#temporals.format(dispatchDates1[pedido.id], 'dd/MM/yyyy')}"
+							                  th:class="${dispatchDates1[pedido.id].isEqual(fecha_hoy) ? 'today-dispatch' : ''}"></span>
+							        </span>		
+									<span th:unless="${nextDispatchDates != null and nextDispatchDates[pedido.id] != null}">
+									    <span th:if="${#lists.contains(warningPedidos, pedido) 
+									        or (pedido.estadoEnum?.name() == 'PENDIENTE' and (
+									            (pedido.fechaEntrega != null and (
+									                pedido.fechaEntrega.isEqual(fecha_hoy.plusDays(1)) 
+									                or (fecha_hoy.dayOfWeek.value == 6 and pedido.fechaEntrega.isEqual(fecha_hoy.plusDays(2)))
+									            )) 
+									            or (pedido.fechaEntrega == null and pedido.getCalculatedFechaEntrega() != null and (
+									                pedido.getCalculatedFechaEntrega().isEqual(fecha_hoy.plusDays(1)) 
+									                or (fecha_hoy.dayOfWeek.value == 6 and pedido.getCalculatedFechaEntrega().isEqual(fecha_hoy.plusDays(2)))
+									            ))
+									        ))
+									        or (pedido.estadoEnum?.name() == 'PARCIAL' and (
+									            pedido.fechaPrimerEnvio.isEqual(fecha_hoy.plusDays(1)) 
+									            or (fecha_hoy.dayOfWeek.value == 6 and pedido.fechaPrimerEnvio.isEqual(fecha_hoy.plusDays(2)))
+									        ))
+									    }">
+									        <span class="red-circle"></span>
+									    </span>
+									</span>
+							        <span th:if="${(pedido.estadoEnum.name() == 'PENDIENTE' and pedido.fechaEntrega != null and pedido.fechaEntrega.isBefore(fecha_hoy)) or 
+							                       (pedido.estadoEnum.name() == 'PENDIENTE' and pedido.fechaEntrega == null and 
+							                        pedido.getCalculatedFechaEntrega() != null and pedido.getCalculatedFechaEntrega().isBefore(fecha_hoy)) or 
+							                       (pedido.estadoEnum.name() == 'PARCIAL' and dispatchDates1[pedido.id] != null and 
+							                        dispatchDates1[pedido.id].isBefore(fecha_hoy))}">
+							            <span th:text="'Atrasado'" class="delayed"></span>
+							        </span>							        
+							         <span th:if="${pedido.estadoEnum != null and pedido.estadoEnum.name() == 'PARCIAL' and nextDispatchDates != null and nextDispatchDates[pedido.id] != null}">
+							            <span th:text="'No finalizado'" class="delayed"></span>
+							        </span>
+							    </td>							    
+							    <td>
+							        <a class="btn btn-custom-warning btn-sm"
+							           th:href="@{/admin/pedidos/detalle/{id}(id=${pedido.id}, page=${cPage != null ? cPage : 0}, refererUrl='listado-pedidos')}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+											fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+											<path
+												d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+										</svg>
+
+							        </a>
+							    </td>							
+							    <td>
+							        <button type="button" class="btn btn-custom-danger btn-sm text-white" data-bs-toggle="modal" data-bs-target="#modal-delete_pedido"
+							                th:data-id="${pedido.id}" th:data-numero="${pedido.numero}" data-source="listado">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+												fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+												<path
+													d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+												<path
+													d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+											</svg>
+							        </button>
+							    </td>
+							</tr>
+						</tbody>
+					</table>
+					
+					<!-- Modal -->
+					<div class="modal fade" id="modal-delete_pedido" tabindex="-1" aria-labelledby="exampleModalLabel"
+						aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="exampleModalLabel">Confirmar Borrado</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal"
+										aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<p>Borrar el pedido número <span id="pedido-numero">Número pedido</span>?</p>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary"
+										data-bs-dismiss="modal">Cerrar</button>
+									<a id="confirm-delete" href="#" class="btn btn-danger">Borrar</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>				
+				<div class="row mt-2">
+					<nav aria-label="Page navigation" th:if="${pedidos.totalPages > 1}">
+						<ul class="pagination justify-content-end">							
+							<li class="page-item" th:class="${pedidos.number == 0 ? 'disabled' : ''}">
+								<a class="page-link" th:href="@{/admin/pedidos(page=0)}">&laquo;</a>
+							</li>	
+							<li class="page-item" th:class="${pedidos.hasPrevious() ? '' : 'disabled'}">
+								<a class="page-link" th:href="@{/admin/pedidos(page=${pedidos.number })}"
+									th:disabled="${!pedidos.hasPrevious()}">Anterior</a>
+							</li>							
+							<li class="page-item disabled d-none d-sm-block">
+							    <span class="page-link">
+							        Página <strong th:text="${pedidos.number + 1}"></strong> de <strong th:text="${pedidos.totalPages}"></strong>
+							    </span>
+							</li>							
+							<li class="page-item" th:class="${pedidos.number + 1 == pedidos.totalPages ? 'disabled' : ''}">
+								<a class="page-link" th:href="@{/admin/pedidos(page=${pedidos.number + 2})}"
+									th:disabled="${pedidos.number + 1 == pedidos.totalPages}">Siguiente</a>
+							</li>
+							<li class="page-item" th:class="${pedidos.number == pedidos.totalPages - 1 ? 'disabled' : ''}">
+								<a class="page-link" th:href="@{/admin/pedidos(page=${pedidos.totalPages })}">&raquo;</a>
+							</li>
+						</ul>
+					</nav>
+				</div>					
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+	<script src="/js/app.js"></script>	
+
+</body>
+</html>

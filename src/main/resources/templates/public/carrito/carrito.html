@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title th:text="${titulo}"></title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+	<div class="wrapper">
+		<header>
+			<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+		</header>
+		<main>
+			<div class="row mt-5">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item">
+						<a th:href="${page != null} ? @{/platos(page=${page})} : @{/platos}">Home</a>
+					</li>
+					<li class="breadcrumb-item active">Carrito</li>
+				</ol>
+				<div th:if="${carritoMsg}" class="alert alert-warning alert-dismissible fade show">
+					<p th:utext="${carritoMsg}"></p>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+				<div class="card mb-4">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-9">
+								<div class="row table-responsive">
+									<table class="table">
+										<thead>
+											<tr>
+												<th scope="col">Producto</th>
+												<th scope="col">Precio</th>
+												<th scope="col">Cantidad</th>
+												<th scope="col">Total</th>
+												<th scope="col">Quitar</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:if="${cart?.empty}">
+												<td colspan="6">El carrito de compra está vacío.</td>
+											</tr>
+											<tr th:each="dorden : ${cart}">
+												<td th:if="${dorden.plato.id != 0}" th:text="${dorden.plato.nombre}">
+												</td>
+												<td th:if="${dorden.menu.id != 0}"
+													th:text="${dorden.menu.nombre} +' ('+menu+')'">
+												</td>
+												<td th:if="${dorden.plato.id != 0}"
+													th:text="${dorden.plato.precio_of > 0 ? #numbers.formatDecimal(dorden.plato.precio_of, 1, 2) : #numbers.formatDecimal(dorden.plato.precio, 1, 2)} + ' €'">
+												</td>
+												<td th:if="${dorden.menu.id != 0}"
+													th:text="${#numbers.formatDecimal(dorden.menu.precio, 1, 2)} + ' €'">
+												</td>
+												<td th:text="${dorden.cantidadCart}"></td>
+												<td th:if="${dorden.plato.id != 0}"
+													th:text="${dorden.plato.precio_of > 0 ? #numbers.formatDecimal(dorden.plato.precio_of * dorden.cantidadCart, 1, 2) : #numbers.formatDecimal(dorden.plato.precio * dorden.cantidadCart, 1, 2)} + ' €'">
+												</td>
+												<td th:if="${dorden.menu.id != 0}"
+													th:text="${#numbers.formatDecimal(dorden.menu.precio * dorden.cantidadCart, 1, 2)} + ' €'">
+												</td>
+												<td>
+													<a th:if="${dorden.plato != null && dorden.plato.id != 0}"
+														th:href="@{/platos/delete/cart/{id}(id=${dorden.plato.id}, type='plato')}">
+														<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+															fill="red" class="bi bi-trash" viewBox="0 0 16 16">
+															<path
+																d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+															<path
+																d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+														</svg>
+													</a>
+													<a th:if="${dorden.menu != null && (dorden.plato == null || dorden.plato.id == 0)}"
+														th:href="@{/platos/delete/cart/{id}(id=${dorden.menu.id}, type='menu')}">
+														<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+															fill="red" class="bi bi-trash" viewBox="0 0 16 16">
+															<path
+																d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+															<path
+																d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+														</svg>
+													</a>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<a th:href="@{/platos}" th:if="${!isParcial}" class="btn btn-dark"
+									th:text="${numeroItemsCarrito == 0 ? 'Añadir items al carrito' : 'Añadir más items al carrito'}">
+									Añadir items al carrito
+								</a>
+
+							</div>
+							<div class="col-lg-3">
+								<ul class="list-group">
+									<li class="list-group-item">
+										Total precio pedido: <strong>
+											<p th:text="${#numbers.formatDecimal(pedidoTotal, 1, 2)} + ' €'"
+												class="text-end"></p>
+										</strong>
+									</li>
+									<li class="list-group-item" th:if="${!cart?.empty}">Precio envío: <strong>
+											<p class="text-end"
+												th:text="${#numbers.formatDecimal(precioEnvio, 1, 2)} + ' €'"></p>
+										</strong></li>
+									<li class="list-group-item" th:if="${!cart?.empty}"><strong>TOTAL: <p
+												class="text-end"
+												th:text="${#numbers.formatDecimal(total, 1, 2)} + ' €'"></p></strong>
+									</li>
+									<a th:href="@{/platos/order}" th:if="${#lists.size(cart) > 0}"
+										class="btn btn-dark">Ver
+										Orden</a>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<th:block th:insert="~{public/navigation::footer}"></th:block>
+	</div>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

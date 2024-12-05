@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Detalle</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+</head>
+
+<body id="page-top">
+	<div class="ms-4 mt-5">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a th:href="${isFavoritesView} 
+	            ? @{/usuario/favs} 
+	            : (idCategoria != null 
+	                ? @{/platos(idCategoria=${idCategoria}, page=${page})} 
+	                : @{/platos})">Platos</a>
+				</li>
+				<li class="breadcrumb-item active">Plato</li>
+			</ol>
+		</div>
+	<div class="container" id="contenido">
+		<th:block th:insert="~{public/navigation::main-nav}"></th:block>		
+		<div class="card detail-card mb-4">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-lg-4">
+						<img src="http://placehold.it/400x400" alt="Imagen del plato"
+							th:src="${#strings.isEmpty(plato.imagen)} ? @{/images/default.jpg} : @{/images/{img}(img=${plato.imagen})}"
+							class="img-responsive" />
+						<p th:if="${plato.noDisponible}" class="text-danger mt-3">No disponible</p>
+					</div>
+					<div class="col-lg-1"></div>
+					<div class="col-lg-7">
+						<form th:action="@{/platos/cart}" method="POST">
+							<input type="hidden" th:value="${plato.id}" name="id">
+							<input type="hidden" name="type" value="plato">
+							<h2 class="card-title" th:text="${plato.nombre}"></h2>
+							<ul class="list-group">
+								<li class="list-group-item">
+									<h5>
+										<span th:if="${plato.precio_of > 0}">
+											Precio: <span th:text="${#numbers.formatDecimal(plato.precio, 1, 2)} + ' €'"
+												style="text-decoration: line-through;"></span>
+										</span>
+										<span th:if="${plato.precio_of > 0}"
+											th:text="${#numbers.formatDecimal(plato.precio_of, 1, 2)} + ' €'"
+											style="color: red;"></span>
+										<span th:if="${plato.precio_of == 0}"
+											th:text="'Precio: ' + ${#numbers.formatDecimal(plato.precio, 1, 2)} + ' €'"></span>
+									</h5>
+								</li>
+								<li class="list-group-item">								
+									<ul class="nav nav-tabs" id="myTab" role="tablist">
+										<li class="nav-item" role="presentation">
+											<a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#home"
+												role="tab" aria-controls="home" aria-selected="true">Descripción</a>
+										</li>
+										<li class="nav-item" role="presentation">
+											<a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile"
+												role="tab" aria-controls="profile"
+												aria-selected="false">Ingredientes</a>
+										</li>
+									</ul>								
+									<div class="tab-content mt-4" id="myTabContent">
+										<div class="tab-pane fade show active mt-3" id="home" role="tabpanel"
+											aria-labelledby="home-tab">
+											<span th:utext="${plato.descripcion}"> Descripción </span>
+										</div>
+										<div class="tab-pane fade" id="profile" role="tabpanel"
+											aria-labelledby="profile-tab">
+											<ul>
+												<li th:each="i : ${plato.ingredientes}">
+													<span th:text="${i.nombre}">Ingrediente</span>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</li>
+								<li sec:authorize="isAuthenticated()" class="list-group-item">
+									<h6>
+										Cantidad: <input type="number" id="cantidad" name="cantidad" autocomplete="off"
+											min="1" max="5" value="1">
+									</h6>
+								</li>
+							</ul>
+							<button sec:authorize="isAuthenticated()" type="submit" class="btn btn-dark"
+								th:disabled="${plato.noDisponible}">Añadir al carrito</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+	
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+
+</body>
+</html>

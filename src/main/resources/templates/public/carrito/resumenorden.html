@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Resumen pedido</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+</head>
+<body>
+	<div class="container-fluid">
+		<header>
+			<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+		</header>
+		<main>
+			<div class="row mt-5">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a th:href="@{/platos}">Home</a></li>
+					<li class="breadcrumb-item active">Orden</li>
+				</ol>
+				<th:block th:insert="~{public/navigation::etapas-envio}"></th:block>
+				<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+					<p th:text="${errorMessage}"></p>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+				<div class="card mb-4">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-9">
+								<div class="card-body">
+									<p th:if="${numeroItemsCarrito < 10 && allItemsPlatos}" th:text="${numeroItemsCarrito < 10 && allItemsPlatos ? 'Para hacer un pedido hay que elegir mínimo 10 platos o al menos un menú.' : ''}" id="aviso"></p>
+									<h5 class="card-title datosorden">
+										DATOS ORDEN
+									</h5>
+									<h6 th:if="${cart != null and !#lists.isEmpty(cart)}"
+										th:text=" 'Nombre: '+ ${usuario.nombre}"> </h6>
+									<h6 th:if="${cart != null and !#lists.isEmpty(cart)}"
+										th:text="'Correo: '+  ${usuario.email}"></h6>								
+									<h6 th:if="${cart != null and !#lists.isEmpty(cart)}"
+										th:text="'Fecha: ' + ${#temporals.format(fecha, 'dd/MM/yyyy')}">
+									</h6>
+									<h5 class="card-title mt-3 datosorden">
+										PRODUCTOS
+									</h5>
+									<div class="row table-responsive">
+										<table class="table">
+											<thead>
+												<tr>
+													<th scope="col">Producto</th>
+													<th scope="col">Precio</th>
+													<th scope="col">Cantidad</th>
+													<th scope="col">Subtotal</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr th:each="cartItem : ${cart}">
+													<td th:if="${cartItem.plato.id != 0}"
+														th:text="${cartItem.plato.nombre}"></td>
+													<td th:if="${cartItem.menu.id != 0}"
+														th:text="${cartItem.menu.nombre}"></td>												
+													<td th:if="${cartItem.plato.id != 0}"
+														th:text="${cartItem.plato.precio_of > 0 ? #numbers.formatDecimal(cartItem.plato.precio_of, 1, 2) : #numbers.formatDecimal(cartItem.plato.precio, 1, 2)} + ' €'">
+													</td>
+													<td th:if="${cartItem.menu.id != 0}"
+														th:text="${#numbers.formatDecimal(cartItem.menu.precio, 1, 2)} + ' €'">
+													</td>
+													<td th:text="${cartItem.cantidadCart}"></td>												
+													<td th:if="${cartItem.plato.id != 0}"
+														th:text="${cartItem.plato.precio_of > 0 ? #numbers.formatDecimal(cartItem.plato.precio_of * cartItem.cantidadCart, 1, 2) : #numbers.formatDecimal(cartItem.plato.precio * cartItem.cantidadCart, 1, 2)} + ' €'">
+													</td>
+													<td th:if="${cartItem.menu.id != 0}"
+														th:text="${#numbers.formatDecimal(cartItem.menu.precio * cartItem.cantidadCart, 1, 2)} + ' €'">
+													</td>
+												</tr>
+												
+											</tbody>
+											<tfoot>
+												<tr>
+													<td colspan="2" style="text-align: left;"><strong>TOTAL:</strong>
+													</td>
+													<td>
+														<span
+															th:text="${numeroItemsCarrito != null ? numeroItemsCarrito : 0}"></span>
+														uds.
+													</td>
+													<td>
+														<span
+															th:text="${#numbers.formatDecimal(pedido.total, 1, 2)} + ' €'"></span>
+													</td>
+												</tr>												
+											</tfoot>
+										</table>
+									</div>	
+									<a th:href="@{/platos/getCart}" class="btn btn-dark">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+											fill="currentColor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16">
+											<path fill-rule="evenodd"
+												d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5" />
+										</svg>
+										Atrás</a>
+									<a th:href="@{/platos}"  th:if="${!isParcial}"  class="btn btn-dark">Añadir más items al carrito</a>
+								</div>
+							</div>
+							<div class="col-lg-3 mt-3">
+								<ul class="list-group">									
+									<li class="list-group-item">
+										Total precio pedido: <strong>
+											<p th:text="${#numbers.formatDecimal(pedido.total, 1, 2)} + ' €'"
+												class="text-end"></p>
+										</strong>
+									</li>									
+									<li class="list-group-item" th:if="${!cart?.empty}">
+										Precio envío: <strong>
+											<p class="text-end"
+												th:text="${#numbers.formatDecimal(precioEnvio, 1, 2)} + ' €'"></p>
+										</strong>
+									</li>
+									<li class="list-group-item" th:if="${!cart?.empty}">
+										<strong>TOTAL: <p class="text-end"
+												th:text="${#numbers.formatDecimal(total, 1, 2)} + ' €'"></p></strong>
+									</li>
+									
+									<a th:href="@{/cart/direccion}" class="btn btn-dark"
+										th:if="${!cartEmpty && (numeroItemsCarrito >= 10 && allItemsPlatos || (numeroItemsCarrito < 10 && atLeastOneMenu))}">
+										Continuar
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+											fill="currentColor" class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
+											<path fill-rule="evenodd"
+												d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8m-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5" />
+										</svg>
+									</a>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<th:block th:insert="~{public/navigation::footer}"></th:block>
+	</div>
+
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+</body>
+</html>

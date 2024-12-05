@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Editar perfil</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<div class="ms-4 mt-5">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item">
+				<a th:href="@{/platos}">Home</a>
+			</li>
+			<li class="breadcrumb-item active">
+				<a th:href="@{/cliente/perfil}">Perfil</a>
+			</li>
+			<li class="breadcrumb-item active">Modificar</li>
+		</ol>
+		<h1 class="text-center mt-5">Modificar datos</h1>
+	</div>
+	<div class="container-fluid">
+		<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2 col-1"></div>
+			<div class="col-md-8 col-10">
+				<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible" role="alert">
+					<p th:text="${errorMessage}"></p>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>				
+				<div>
+					<form th:object="${modificado}" th:action="@{/modificar/submit}" class="form-perfil" method="post">
+						<input type="hidden" name="id" th:field="*{id}" />
+						<p>Nombre: <input type="text" th:field="*{nombre}" class="form-control" /></p>
+						<!--    <p>DNI: <input type="text" th:field="*{dni}" class="form-control" /></p>-->
+						<p>Localidad: <input type="text" th:field="*{localidad}" class="form-control" /></p>
+						<p>Email: <input type="text" th:field="*{email}" class="form-control" /></p>
+						<p>Username: <input type="text" th:field="*{username}" class="form-control" /></p>
+						
+						<div id="passwordFields" style="display: none;">
+							<p>Nueva Contraseña: <input type="password" id="newPassword" name="newPassword"
+									class="form-control" /></p>
+							<p>Confirmar Contraseña: <input type="password" id="confirmPassword" name="confirmPassword"
+									class="form-control" /></p>
+						</div>
+
+						<div class="text-end mt-3">
+							<button type="button" class="btn btn-secondary mb-5" id="togglePasswordButton">Cambiar
+								Contraseña</button>
+							<button type="submit" class="btn btn-primary mb-5">Guardar</button>
+						</div>
+					</form>
+				</div>				
+			</div>
+			<div class="col-md-2 col-1"></div>
+		</div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+
+	<script>
+		document.getElementById("togglePasswordButton").onclick = function () {
+			var passwordFields = document.getElementById("passwordFields");
+			if (passwordFields.style.display === "none") {
+				passwordFields.style.display = "block";
+				this.textContent = "Ocultar Contraseña"; 
+			} else {
+				passwordFields.style.display = "none";
+				this.textContent = "Cambiar Contraseña"; 
+			}
+		};
+	</script>
+
+</body>
+</html>

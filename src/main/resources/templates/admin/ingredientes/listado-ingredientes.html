@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${titulo}">Título</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<div th:insert="~{admin/fragmentos::horizontal-nav}"></div>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+		</div>
+		<div class="col-9 content-area">
+			<div class="col-9-content">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="pull-right mb-3">
+							<a href="form_add_plato.html" th:href="@{/admin/ingredientes/nuevoingr}"
+								class="btn btn-custom-success">Nuevo ingrediente</a>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<th:block th:insert="~{admin/fragmentos::search-box}"></th:block>
+					</div>
+				</div>
+				<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+					<p th:text="${errorMessage}"></p>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+				<div class="row table-responsive">
+					<table class="table table-hover">
+						<thead class="table-dark bg-info text-white">
+							<tr>
+								<th>Id</th>
+								<th scope="col">Nombre</th>
+								<th scope="col">Editar</th>
+								<th scope="col">Borrar</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${ingredientes.empty}">
+								<td colspan="6">No hay ingredientes</td>
+							</tr>
+							<tr th:each="ingr : ${ingrLista}">
+								<td><span th:text="${ingr.id}">Id</span></td>
+								<td><span th:text="${ingr.nombre}"></span></td>								
+								<td>
+									<a class="btn btn-custom-success btn-sm"
+										th:href="@{/admin/ingredientes/editIngr/{id}(id=${ingr.id})}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+											fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+											<path
+												d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+											<path fill-rule="evenodd"
+												d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+										</svg>
+									</a>
+								</td>
+								<td>
+									<button type="button" class="btn btn-custom-danger btn-sm text-white"
+										data-bs-toggle="modal" data-bs-target="#modal-delete_ingr" th:data-id="${ingr.id}"
+										th:data-name="${ingr.nombre}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+											fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">-->
+											<path
+												d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+											<path
+												d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+										</svg>
+									</button>
+								</td>
+
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- Modal -->
+					<div class="modal fade" id="modal-delete_ingr" tabindex="-1" aria-labelledby="exampleModalLabel"
+						aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="exampleModalLabel">Confirmar Borrado</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal"
+										aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<p>¿Borrar el ingrediente <span id="ingredient-name"></span>?</p>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary"
+										data-bs-dismiss="modal">Cerrar</button>
+									<a id="confirm-delete" href="#" class="btn btn-danger">Borrar</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row mt-2">
+				    <nav aria-label="Page navigation" th:if="${ingrLista.totalPages > 1}">
+				        <ul class="pagination justify-content-end">				           
+				            <li class="page-item" th:class="${ingrLista.number == 0 ? 'disabled' : ''}">
+				                <a class="page-link" th:href="@{/admin/ingredientes(page=0)}">&laquo;</a>
+				            </li>					
+				            <li class="page-item" th:class="${ingrLista.hasPrevious() ? '' : 'disabled'}">
+				                <a class="page-link" th:href="@{/admin/ingredientes(page=${ingrLista.number})}"
+				                    th:disabled="${!ingrLista.hasPrevious()}">Anterior</a>
+				            </li>					          
+				            <li class="page-item disabled d-none d-sm-block">
+				                <span class="page-link">
+				                    Página <strong th:text="${ingrLista.number + 1}"></strong> de <strong th:text="${ingrLista.totalPages}"></strong>
+				                </span>
+				            </li>					           
+				            <li class="page-item" th:class="${ingrLista.number + 1 == ingrLista.totalPages ? 'disabled' : ''}">
+				                <a class="page-link" th:href="@{/admin/ingredientes(page=${ingrLista.number + 2})}"
+				                    th:disabled="${ingrLista.number + 1 == ingrLista.totalPages}">Siguiente</a>
+				            </li>					         
+				            <li class="page-item" th:class="${ingrLista.number == ingrLista.totalPages - 1 ? 'disabled' : ''}">
+				                <a class="page-link" th:href="@{/admin/ingredientes(page=${ingrLista.totalPages })}">&raquo;</a>
+				            </li>
+				        </ul>
+				    </nav>
+				</div>	
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+	
+</body>
+</html>

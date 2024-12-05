@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${titulo}">Título</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css"> 
+</head>
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<th:block th:insert="~{admin/fragmentos::horizontal-nav}"></th:block>  
+	<div class="container-fluid">		
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<th:block th:insert="~{admin/fragmentos::vertical-nav}"></th:block>
+		</div>	
+		<div class="col-9 content-area">	
+			<div class="row">
+					<div class="col-6">
+			            <h4>Usuario: <span th:text="${username}"></span></h4>			   
+			        </div>	
+		  	<div class="col-md-6 text-end">
+	             <section>
+		           <div id="currentDate"></div>
+		           <div id="reloj"></div> 
+		        </section>  
+	        </div>  
+			<div class="row custom-margin-top">
+				<div class="col-lg-3 col-md-6 mb-4"> 			
+					  <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Clientes</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+											<span class="counter" th:data-to="${numUsuarios}"></span></div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+				</div>
+				<div class="col-lg-3 col-md-6 mb-4"> 
+                         <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Pedidos</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+											<span  class="counter" th:data-to="${numPedidos}"></span></div>
+                                    </div>                                      
+                                  
+                                </div>
+                            </div>
+                        </div>
+				</div>
+				<div class="col-lg-3 col-md-6 mb-4"> 
+                     <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+								<div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Platos</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+										<span  class="counter" th:data-to="${numPlatos}"></span></div>
+                                </div>                                      
+                              
+                            </div>
+                        </div>
+                    </div>
+				</div>
+				<div class="col-lg-3 col-md-6 mb-4"> 
+                     <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+								<div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Menus</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+										<span  class="counter" th:data-to="${numMenus}"></span></div>
+                                </div>                                      
+                              
+                            </div>
+                        </div>
+                    </div>
+				</div>					
+			</div>	
+			<canvas id="pedidosChart" width="400" height="200"></canvas>	
+		</div>
+	</div>
+	
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-countto/1.2.0/jquery.countTo.min.js"></script>	
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>	
+	<script src="js/app.js"></script>	
+		
+</body>
+</html>

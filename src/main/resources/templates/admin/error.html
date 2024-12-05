@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error</title>  
+    <link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"> 
+    <link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+</head>
+<body>
+	<div class="row text-center mt-5">
+		<div class="col-12">
+		    <h1>Error</h1>
+<!--		    <p>Está intentando modificar un ID inexistente.</p>-->
+<!--		    <p th:text="${errorMsg}"></p>		    		   -->
+		    <img src="/img/404.png" />	
+		    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible" role="alert">
+				<p th:text="${errorMessage}"></p>				
+			</div>	     
+	    </div>
+    </div>
+    <div class="row text-center">
+		<a th:href="@{/admin}" class="btn btn-dark">Volver</a>
+	</div>
+</body>
+</html>

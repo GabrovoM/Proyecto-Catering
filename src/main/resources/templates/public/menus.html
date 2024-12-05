@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title th:text="${titulo}">Menús</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+</head>
+<body id="page-top">
+	<header class="jumbotron text-center mt-5">
+		<h1 class="display-3 headings mt-5"> Sabores del Momento </h1>
+		<h2 class="lead subtitle">Perfecto para cada ocasión</h2>
+	</header>
+	<div class="container-fluid">
+		<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+	</div>
+	<div class="container">
+		<div class="row" sec:authorize="isAuthenticated()">
+			<p class="cursiva">Existen dos modalidades para realizar pedidos de menús. En la primera, es posible seleccionar menús y combinarlos con platos sueltos en un mismo pedido, que será entregado en una fecha determinada.
+				Normalmente, la entrega se realiza dos días después de hacer el pedido, o tres días después si se realiza un viernes. (Es posible elegir otra fecha antes de finalizar el pago).
+			</p>
+			<p class="cursiva">En la segunda modalidad, a un pedido solo se pueden añadir menús. Es posible elegir el número de semanas (entre 2 y 6) durante las cuales se entregará un menú cada semana.
+				En este tipo de pedidos, no se pueden añadir más menús o platos fuera de los seleccionados para el número de semanas elegidas.
+				Para realizar un pedido de este tipo, debe seleccionarse el número de semanas y la fecha deseada para la primera entrega. A partir de esa fecha, se entregará uno de los menús del pedido cada semana.
+				El carrito de compra debe estar vacío para poder realizar este tipo de pedido.
+			</p>
+		</div>
+		<div th:if="${numeroItemsCarrito > 0}" class="text-center mt-4">
+			<p><mark>Tienes artículos en el carrito. Si deseas elegir menús para varias semanas, debes realizar un pedido separado.
+				La opción de seleccionar menús para envíos semanales durante varias semanas solo estará habilitada si el carrito está vacío, sin otros productos previamente añadidos.
+				</mark>
+			</p>
+		</div>
+		<form id="cartForm" method="POST" th:action="@{/platos/cart/multiple}" action="#"
+			th:style="${#authentication == null || #authentication.principal == 'anonymousUser' || numeroItemsCarrito > 0} ? 'display: none;' : ''">
+			<div class="row">
+				<p><strong>Elegir menús para envíos semanales</strong></p>
+				<small class="text-danger">Al elegir el número de semanas, aparecerán casillas junto a cada menú. Debes marcar las casillas correspondientes a los menús que deseas añadir.<br>
+				   A partir de la fecha de inicio elegida, se entregará uno de los menús seleccionados cada semana. Para volver al modo normal, selecciona '--'.
+				</small>
+				<div class="row mt-4">
+				<div class="col-md-4">
+					<label for="weeksSelect">Selecciona número de semanas:</label>
+					<select id="weeksSelect" class="form-select  w-100" onchange="toggleCheckboxes()">
+						<option value="0">--</option>
+						<option value="1">2</option>
+						<option value="2">3</option>
+						<option value="3">4</option>
+						<option value="4">5</option>
+						<option value="5">6</option>
+					</select>
+				</div>
+				<div class="col-md-4">
+					<label for="fecha">Selecciona la fecha de inicio:</label>
+					<input type="text" class="form-control w-100" id="fecha" name="fecha" size="10" required
+						autocomplete="off" />
+					<input type="hidden" name="menuIds" id="menuIdsInput">
+					<input type="hidden" name="cantidad" value="1">
+					<input type="hidden" id="numItemsCarrito" th:value="${numeroItemsCarrito}" />
+				</div>
+				<div class="col-md-4">
+					<button type="submit" class="btn btn-dark mt-4">Añadir múltiples menús al carrito</button>
+				</div>
+				</div>
+			</div>
+		</form>
+		<div class="row mt-5">
+			<table class="table table-hover">
+				<thead class="table-dark bg-info text-white">
+					<tr>
+						<th scope="col" colspan="4" id="uno_titulo">Nombre</th>
+						<th>Acción</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${menus?.empty}">
+						<td colspan="6">No hay menus</td>
+					</tr>
+					<tr th:each="menu, stat : ${menus}" th:if="${menu.id != 0}">
+						<td id="uno_menu" colspan="3">
+							<div class="accordion accordion-flush" id="accordionFlushExample">
+								<div class="accordion-item">
+									<h2 class="accordion-header" th:attr="id='flush-heading' + ${menu.id}">
+										<button class="accordion-button collapsed d-flex justify-content-between"
+											type="button" th:data-bs-toggle="collapse"
+											th:data-bs-target="'#flush-collapse' + ${menu.id}" aria-expanded="false"
+											th:aria-controls="'flush-collapse' + ${menu.id}">
+											<span class="menu-name" th:text="${menu.nombre}">Menu Name</span>
+											<span th:text="${menu.noDisponible ? 'No disponible' : ''}"
+												class="me-5 text-danger"></span>
+											<span class="menu-price"
+												th:text="${#numbers.formatDecimal(menu.precio, 1, 2)} + ' €'">Price</span>
+										</button>
+									</h2>
+									<div th:id="'flush-collapse' + ${menu.id}" class="accordion-collapse collapse"
+										th:aria-labelledby="'flush-heading' + ${menu.id}"
+										data-bs-parent="#accordionFlushExample">
+										<div class="accordion-body">
+											<!-- Content inside accordion -->
+											<table class="table table-striped">
+												<thead>
+													<tr>
+														<th>Day</th>
+														<th>Orden</th>
+														<th>Nombre</th>
+														<th>Imagen</th>
+														<th>Acción</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr th:each="plato, iterStat : ${menu.platos}">
+														<!-- Show the day only if it is the first item or if the day changes -->
+														<td th:if="${iterStat.index == 0 || (menu.platos[iterStat.index - 1].dia != plato.dia)}"
+															th:text="${plato.dia}">Day</td>
+														<td
+															th:unless="${iterStat.index == 0 || (menu.platos[iterStat.index - 1].dia != plato.dia)}">
+														</td>
+														<td>
+															<span th:switch="${plato.orden}">
+																<span th:case="1"
+																	class="badge bg-secondary">Primero</span>
+																<span th:case="2"
+																	class="badge bg-primary">Segundo</span>
+															</span>
+														</td>
+														<td th:text="${plato.plato.nombre}">Nombre</td>
+														<td>
+															<img th:src="${plato.plato.imagen != null && !plato.plato.imagen.isEmpty() ? '/images/' + plato.plato.imagen : '/images/default.jpg'}"
+																alt="Imagen de plato" style="width: 150px; height: auto;">
+														</td>
+														<td>
+															<a href="#" class="btn btn-custom-warning btn-ver-plato"
+																th:data-id="${plato.plato.id}">
+																<svg xmlns="http://www.w3.org/2000/svg" width="16"
+																	height="16" fill="currentColor" class="bi bi-search"
+																	viewBox="0 0 16 16">
+																	<path
+																		d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+																</svg>
+															</a>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+											<div class="product-price">
+												<p><strong>Precio total:</strong> <span
+														th:text="${#numbers.formatDecimal(menu.precio,1,2)} + ' €'">Precio</span>
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</td>
+						<td>
+							<input type="checkbox" class="menu-checkbox" th:id="'menuCheckbox_' + ${menu.id}"
+								th:value="${menu.id}" th:disabled="${menu.noDisponible}" />
+						</td>
+						<td>
+							<form th:action="@{/platos/cart}" method="post">
+								<input type="hidden" name="id" th:value="${menu.id}" />
+								<input type="hidden" name="type" value="menu" />
+								<button type="submit" class="btn btn-primary add-to-cart-button"
+									th:disabled="${menu.noDisponible}">
+									Añadir al carrito
+								</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Plato Detalles Modal -->
+		<div class="modal fade" id="platoModal" tabindex="-1" aria-labelledby="platoModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="platoModalLabel">Plato Details</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<!-- Plato insertado dinámicamente via jQuery -->
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div th:if="${menus.totalPages > 1}" class="form-group col-md-11 pagination-centered">
+				<ul class="pagination">
+					<!-- Previous page link to the first page -->
+					<li th:class="${menus.number == 0} ? 'disabled'">
+						<a class="page-link" th:if="${menus.number != 0}"
+							th:href="@{/menus(page=1, date=${param.date})}">&laquo;</a>
+						<span th:if="${menus.number == 0}">&laquo;</span>
+					</li>
+					<li th:class="${menus.number == 0} ? 'disabled'">
+						<a class="page-link" th:if="${menus.number != 0}"
+							th:href="@{/menus(page=${menus.number}, date=${param.date})}">&larr;</a>
+						<span th:if="${menus.number == 0}">&larr;</span>
+					</li>
+					<li th:each="page : ${#numbers.sequence(1, menus.totalPages)}"
+						th:class="${menus.number + 1 == page} ? 'active pointer-disabled'">
+						<a class="page-link" th:href="@{/menus(page=${page}, date=${param.date})}"
+							th:text="${page}"></a>
+					</li>
+					<li th:class="${menus.number + 1 == menus.totalPages} ? 'disabled'">
+						<a class="page-link" th:if="${menus.number + 1 != menus.totalPages}"
+							th:href="@{/menus(page=${menus.number + 2}, date=${param.date})}">&rarr;</a>
+						<span th:if="${menus.number + 1 == menus.totalPages}">&rarr;</span>
+					</li>
+					<li th:class="${menus.number + 1 == menus.totalPages} ? 'disabled'">
+						<a class="page-link" th:if="${menus.number + 1 != menus.totalPages}"
+							th:href="@{/menus(page=${menus.totalPages}, date=${param.date})}">&raquo;</a>
+						<span th:if="${menus.number + 1 == menus.totalPages}">&raquo;</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<!-- SweetAlert2 JS -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const currentPath = window.location.pathname;
+			const referrerPath = document.referrer ? new URL(document.referrer).pathname : null;
+			if (currentPath !== referrerPath) {
+				localStorage.removeItem('selectedWeeks');
+				localStorage.removeItem('checkedMenus');
+				localStorage.removeItem('selectedDate');
+			}
+			initializeSelections();
+			toggleCheckboxes();
+			document.getElementById('cartForm').onsubmit = handleFormSubmit;
+		});
+
+		function initializeSelections() {
+			const savedWeeks = localStorage.getItem('selectedWeeks') || '0';
+			document.getElementById('weeksSelect').value = savedWeeks;
+			const checkedMenus = JSON.parse(localStorage.getItem('checkedMenus')) || [];
+			checkedMenus.forEach(menuId => {
+				const checkbox = document.getElementById('menuCheckbox_' + menuId);
+				if (checkbox) {
+					checkbox.checked = true; 
+				}
+			});
+			const storedDate = localStorage.getItem('selectedDate');
+			if (storedDate) {
+				document.getElementById('fecha').value = storedDate;
+			}
+			document.getElementById('fecha').addEventListener('change', function () {
+				localStorage.setItem('selectedDate', this.value);
+			});
+		}
+
+		function toggleCheckboxes() {
+			const select = document.getElementById('weeksSelect');
+			const checkboxes = document.querySelectorAll('.menu-checkbox');
+			const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
+			const selectedWeeks = select.value;
+			localStorage.setItem('selectedWeeks', selectedWeeks);
+			if (selectedWeeks === "0") {
+				checkboxes.forEach(checkbox => {
+					checkbox.checked = false;
+					checkbox.style.display = 'none';
+				});
+				localStorage.removeItem('checkedMenus');
+				localStorage.removeItem('selectedDate');
+				document.getElementById('fecha').value = '';
+				addToCartButtons.forEach(button => {
+					button.style.display = 'inline-block';
+				});
+			} else {
+				checkboxes.forEach(checkbox => {
+					checkbox.style.display = 'inline-block';
+				});
+				restoreCheckedMenus();
+				addToCartButtons.forEach(button => {
+					button.style.display = 'none';
+				});
+			}
+		}
+
+		function restoreCheckedMenus() {
+			const checkedMenus = JSON.parse(localStorage.getItem('checkedMenus')) || [];
+			const checkboxes = document.querySelectorAll('.menu-checkbox');
+			checkboxes.forEach(checkbox => {
+				checkbox.checked = checkedMenus.includes(checkbox.id.replace('menuCheckbox_', ''));
+			});
+		}
+		document.querySelectorAll('.menu-checkbox').forEach(checkbox => {
+			checkbox.addEventListener('change', function () {
+				updateCheckedMenus(this);
+			});
+		});
+
+		function updateCheckedMenus(checkbox) {
+			const checkedMenus = JSON.parse(localStorage.getItem('checkedMenus')) || [];
+			const menuId = checkbox.id.replace('menuCheckbox_', '');
+			const selectedWeeks = parseInt(document.getElementById('weeksSelect').value);
+			const maxSelection = selectedWeeks + 1;
+			if (checkbox.checked) {
+				if (checkedMenus.length < maxSelection) {
+					checkedMenus.push(menuId);
+				} else {
+					Swal.fire({
+						icon: 'error',
+						title: 'Límite de selección alcanzado',
+						text: "No puedes elegir más menús que el número de semanas seleccionadas.",
+					});
+					checkbox.checked = false;
+					return;
+				}
+			} else {
+				const index = checkedMenus.indexOf(menuId);
+				if (index > -1) {
+					checkedMenus.splice(index, 1);
+				}
+			}
+			localStorage.setItem('checkedMenus', JSON.stringify(checkedMenus));
+		}
+
+		document.querySelectorAll('.pagination .page-link').forEach(link => {
+			link.addEventListener('click', function (event) {
+				event.preventDefault();
+				const pageUrl = this.getAttribute('href');
+				const selectedDate = document.getElementById("fecha").value;
+				const url = new URL(pageUrl, window.location.origin);
+				url.searchParams.set('date', selectedDate);
+				const selectedWeeks = document.getElementById('weeksSelect').value;
+				localStorage.setItem('selectedWeeks', selectedWeeks);
+				window.location.href = url.toString();
+			});
+		});
+
+		function handleFormSubmit(event) {
+			event.preventDefault();
+			const selectedWeeks = parseInt(document.getElementById('weeksSelect').value);
+			const checkedMenus = JSON.parse(localStorage.getItem('checkedMenus')) || [];
+			const numeroItemsCarrito = parseInt(document.getElementById('numItemsCarrito').value) || 0;
+			if (isNaN(selectedWeeks) || selectedWeeks === 0) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Atención',
+					text: 'Debes seleccionar número de semanas.',
+				});
+				return;
+			}
+			if (numeroItemsCarrito > 0) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Advertencia',
+					text: 'No puedes agregar este menú porque ya hay otros artículos en el carrito.',
+				});
+				return;
+			}
+			if (checkedMenus.length !== selectedWeeks + 1) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Atención',
+					text: `Debes seleccionar ${selectedWeeks + 1} menú(s) para el número de semanas seleccionado.`,
+				});
+				return;
+			}
+			const selectedDate = document.getElementById('fecha').value;
+			const dateParts = selectedDate.split('-');
+			const selectedDateObj = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+			const currentDate = new Date();
+			currentDate.setHours(0, 0, 0, 0);
+			if (selectedDateObj < currentDate) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Fecha pasada',
+					text: 'La fecha seleccionada ya ha pasado. Por favor, elige una fecha futura.',
+				});
+				return;
+			}
+			document.getElementById('menuIdsInput').value = checkedMenus.join(',');
+			localStorage.clear();
+			clearInputs();
+			this.submit();
+		}
+
+		function clearInputs() {
+			document.querySelectorAll('.menu-checkbox').forEach(checkbox => {
+				checkbox.checked = false;
+			});
+			document.getElementById('weeksSelect').selectedIndex = 0;
+		}
+
+		$(document).on('click', '.btn-ver-plato', function (e) {
+			e.preventDefault(); 
+			var platoId = $(this).data('id'); 
+			$.ajax({
+				url: "/api/platos/" + platoId, 							
+				type: "GET",
+				dataType: "json",  
+				success: function (response) {					
+					if (response && response.nombre) {
+						console.log("Plato - detalles:", response);						
+						let ingredientesHtml = '';
+						if (response.ingredientes && response.ingredientes.length > 0) {
+							ingredientesHtml = '<p><strong>Ingredientes:</strong> ';
+							response.ingredientes.forEach(function (ingrediente, index) {
+								ingredientesHtml += ingrediente.nombre;
+								if (index < response.ingredientes.length - 1) {
+									ingredientesHtml += ', '; 
+								}
+							});
+							ingredientesHtml += '</p>';
+						} else {
+							ingredientesHtml = '<p><strong>Ingredientes:</strong> No hay ingredientes disponibles.</p>';
+						}						
+						$('#platoModal .modal-title').text(response.nombre);
+						$('#platoModal .modal-body').html(`
+		                    <p><strong>Nombre:</strong> ${response.nombre}</p>
+		                    <p><strong>Descripción:</strong> ${response.descripcion ? response.descripcion : ''}</p>
+		                    ${ingredientesHtml}
+		                    <p><strong>Precio:</strong> ${response.precio ? parseFloat(response.precio).toFixed(2) : ''}</p>
+		                    <img src="/images/${response.imagen}" alt="${response.nombre}" class="img-fluid">
+		                `);
+						$('#platoModal').modal('show'); 
+					} else {						
+						console.error("Formato no esperado:", response);
+						alert("Fallo al cargar detalles.");
+					}
+				},					
+				error: function (xhr) {					
+		            if (xhr.status === 404) {
+		                alert("Plato no encontrado.");
+		            } else {
+		                console.error("Error al cargar los detalles del plato:", xhr.responseText);
+		                alert("Fallo al cargar detalles.");
+		            }
+		        }					
+			});
+		});
+	</script>
+
+	<script>
+		$(function () {
+			$("#fecha").datepicker({
+				minDate: 2,
+				dateFormat: 'dd-MM-yy',
+				showButtonPanel: true,
+				closeText: "Cerrar",
+				changeMonth: true,
+				changeYear: true,
+				numberOfMonths: 1,
+				firstDay: 1,
+				dateFormat: "dd-mm-yy",
+				monthNames: [
+					"Enero",
+					"Febrero",
+					"Marzo",
+					"Abril",
+					"Mayo",
+					"Junio",
+					"Julio",
+					"Agosto",
+					"Septiembre",
+					"Octubre",
+					"Noviembre",
+					"Deciembre",
+				],
+				dayNames: [
+					"Domingo",
+					"Lunes",
+					"Martes",
+					"Miércoles",
+					"Jueves",
+					"Viernes",
+					"Sábado",
+				],
+				dayNamesShort: ["Dom", "Lun", "Mar", "Mié", "Juv", "Vie", "Sáb"],
+				dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"],
+				monthNamesShort: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+				yearRange: "2024:2025",
+				nextText: "Siguiente",
+				prevText: "Anterior",
+				beforeShowDay: function (date) {
+					var day = date.getDay();					
+					return [(day != 0), "", ""];
+				}
+			});
+			$("#fecha").on("change", function () {
+				const selectedDate = $(this).val(); 
+				const url = new URL(window.location.href);			
+				url.searchParams.set("date", selectedDate);				
+				window.history.pushState({}, "", url);
+			});			
+			const urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.has("date")) {
+				$("#fecha").val(urlParams.get("date"));
+			}
+		});
+	</script>
+
+</body>
+</html>

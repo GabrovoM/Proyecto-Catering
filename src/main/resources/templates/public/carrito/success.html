@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Pago exitoso</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">	
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">	
+</head>
+<body>
+	<div class="container">
+	<div class="container-fluid">
+		<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+	</div>
+	<div class="row mt-5">	
+	<th:block th:insert="~{public/navigation::etapas-envio}"></th:block>
+	<div class="text-center mt-5">
+		<img src="/img/image-2.png" alt="Imagen estilizada de plato" style="width:40%" />	
+	</div>	
+	<div class="text-center mt-5 alert alert-success">		
+ 		<p>Tu pedido se ha realizado con éxito. Gracias por tu compra.</p>
+	</div>	
+	</div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>	
+	
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+</body>
+</html>

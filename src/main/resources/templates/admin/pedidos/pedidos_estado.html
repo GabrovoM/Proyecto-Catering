@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${titulo}">Título</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<th:block th:insert="~{admin/fragmentos::horizontal-nav}"></th:block>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<th:block th:insert="~{admin/fragmentos::vertical-nav}"></th:block>
+		</div>
+		<div class="col-9 content-area">
+			<div class="col-9-content">
+				<div class="row align-items-center">
+					<div class="col-12 col-md d-flex justify-content-between">
+						<h2 id="envio_hoy">
+							Pedidos semanales con fecha de envío hoy (<span
+								th:text="${#temporals.format(fecha_hoy, 'dd/MM/yyyy')}"></span>)
+						</h2>
+					</div>
+					<div class="col-12 col-md-auto d-flex justify-content-md-end mt-3 mt-md-0">
+						<a th:href="@{/admin/pedidos}" class="custom-green-link">
+							Volver a pedidos
+						</a>
+					</div>
+				</div>
+
+				<div class="row table-responsive mt-4">
+					<table class="table table-hover">
+						<thead class="table-dark bg-info text-white">
+							<tr>
+								<th>Id</th>
+								<th scope="col">Fecha</th>
+								<th scope="col">Número</th>
+								<th scope="col">Cliente</th>
+								<th scope="col">Total</th>
+								<th scope="col">Estado</th>
+								<th scope="col">Detalles</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${listaPedidosE.empty}">
+								<td colspan="7">No hay pedidos</td>
+							</tr>
+							<tr th:each="pedido : ${listaPedidosE}">
+								<td>
+									<span th:text="${pedido.id}"></span>
+								</td>
+								<td><span
+										th:text="${pedido.fechaCreacion.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy'))}"></span>
+								</td>
+								<td><span th:text="${pedido.numero}"></span></td>
+								<td><span th:text="${pedido.usuario.nombre}"></span></td>
+								<td><span th:text="${#numbers.formatDecimal(pedido.total,1,2)} + ' €'"></span></td>
+								<td>
+									<span th:text="${pedido.estadoEnum}"
+										th:class="${(pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PENDIENTE') ? 'pendiente' : 
+									                 (pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL') ? 'parcial' : 
+									                 (pedido.estadoEnum != null && pedido.estadoEnum.name() == 'FINALIZADO') ? 'finalizado' : ''}">
+										Estado
+									</span>
+									<span
+										th:if="${pedido.estadoEnum != null and pedido.estadoEnum.name() != 'FINALIZADO'}">
+										<span th:if="${pedido.estadoEnum.name() == 'PENDIENTE'}">
+											<span th:if="${pedido.fechaEntrega != null}"
+												th:text="${#temporals.format(pedido.fechaEntrega, 'dd/MM/yyyy')}"></span>
+											<span th:if="${pedido.fechaEntrega == null}"
+												th:text="${#temporals.format(pedido.getCalculatedFechaEntrega(), 'dd/MM/yyyy')}"></span>
+										</span>
+										<span th:if="${pedido.estadoEnum.name() == 'PARCIAL'}">
+											<span th:if="${dispatchDates[pedido.id] != null}"
+												th:text="${#temporals.format(dispatchDates[pedido.id], 'dd/MM/yyyy')}"></span>
+										</span>
+										<span
+											th:if="${pedido.estadoEnum.name() != 'PARCIAL' and pedido.fechaPrimerEnvio != null}"
+											th:text="${#temporals.format(pedido.fechaPrimerEnvio, 'dd/MM/yyyy')}"></span>
+									</span>
+									 <span th:if="${pedido.estadoEnum != null and pedido.estadoEnum.name() == 'PARCIAL' and nextDispatchDates != null and nextDispatchDates[pedido.id] != null}">
+							            <span th:text="'No finalizado'" class="delayed"></span>
+							        </span>
+								</td>
+								<td>
+									<a th:href="@{/admin/pedidos/detalle/{id}(id=${pedido.id}, page=${cPage}, refererUrl=${refererUrl})}"
+										class="btn btn-success btn-sm">Ver pedido</a>
+
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+						<p th:text="${errorMessage}"></p>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				</div>
+
+				<div th:if="${pedidos != null and pedidos.totalPages > 1}" class="col-6">
+					<ul class="pagination">
+						<li th:class="${pedidos.number == 0} ? 'disabled'">
+							<a class="page-link" th:if="${pedidos.number != 0}"
+								th:href="@{/admin/pedidos/estado(estado=${estado.name()}, page=0)}">&laquo;</a>
+							<span th:if="${pedidos.number == 0}">&laquo;</span>
+						</li>
+						<li th:class="${pedidos.number == 0} ? 'disabled'">
+							<a class="page-link" th:if="${pedidos.number != 0}"
+								th:href="@{/admin/pedidos/estado(estado=${estado.name()}, page=${pedidos.number - 1})}">&larr;</a>
+							<span th:if="${pedidos.number == 0}">&larr;</span>
+						</li>
+						<li th:each="page : ${#numbers.sequence(1, pedidos.totalPages)}"
+							th:class="${pedidos.number + 1 == page} ? 'active pointer-disabled'">
+							<a class="page-link"
+								th:href="@{/admin/pedidos/estado(estado=${estado.name()}, page=${page - 1})}"
+								th:text="${page}"></a>
+						</li>
+						<li th:class="${pedidos.number + 1 == pedidos.totalPages} ? 'disabled'">
+							<a class="page-link" th:if="${pedidos.number + 1 != pedidos.totalPages}"
+								th:href="@{/admin/pedidos/estado(estado=${estado.name()}, page=${pedidos.number + 1})}">&rarr;</a>
+							<span th:if="${pedidos.number + 1 == pedidos.totalPages}">&rarr;</span>
+						</li>
+						<li th:class="${pedidos.number + 1 == pedidos.totalPages} ? 'disabled'">
+							<a class="page-link" th:if="${pedidos.number + 1 != pedidos.totalPages}"
+								th:href="@{/admin/pedidos/estado(estado=${estado.name()}, page=${pedidos.totalPages - 1})}">&raquo;</a>
+							<span th:if="${pedidos.number + 1 == pedidos.totalPages}">&raquo;</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="/js/app.js"></script>
+</body>
+
+</html>

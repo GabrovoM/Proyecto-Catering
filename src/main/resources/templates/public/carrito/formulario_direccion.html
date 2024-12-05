@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Astur Catering - Ofrecemos una variedad de platos cuidadosamente preparados y listos para
+						disfrutar en la comodidad de su hogar.">
+	<meta name="keywords" content="catering, platos, menús, platos caseros">
+	<title>Dirección de envío</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<div class="container">
+		<div class="container-fluid">
+			<th:block th:insert="~{public/navigation::main-nav}"></th:block>
+		</div>
+		<div class="row mt-5">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a th:href="@{/platos}">Home</a></li>
+				<li class="breadcrumb-item active">Orden</li>
+			</ol>
+			<th:block th:insert="~{public/navigation::etapas-envio}"></th:block>
+			<div class="card mb-4">
+				<div class="card-body">
+					<div class="row">
+						<h5 class="card-title">
+							DIRECCIÓN
+						</h5>
+						<div class="row mb-5 mt-3" th:if="${pordefecto}">							
+							<div class="colcol-lg-4 direccion">
+								<h6 th:text="${cliente}"></h6>
+								<h6 th:text="${calle} + ' ' + ${numero} + ', ' + ${piso}"></h6>
+								<h6 th:text="${cp} + ' ' + ${localidad}"></h6>
+								<input type="checkbox" id="confirmarDir" name="useCurrentAddress">Usar esta
+								direccion<label></label>
+								<button id="cambiarDireccion"
+									class="btn btn-dark botones_fd d-flex justify-content-center gap-3 mt-4">Cambiar
+									direccion</button>
+							</div>
+							<div class="colcol-lg-8"></div>
+						</div>
+						<div class="row">
+							<div class="col-2"></div>
+							<div class="col-8">
+								<form th:action="@{/cart/pago}" method="post">	
+									<div id="dir" class="row" th:classappend="${pordefecto == true} ? 'd-none' : ''">
+										<div class="row">
+											<p>
+												<label for="cliente">Cliente</label>
+												<input type="text" id="cliente" name="cliente"
+													th:value="${usuario.nombre}" required>
+											</p>
+										</div>
+										<div class="row">
+											<p>
+												<label for="calle">Dirección de entrega</label>
+												<input type="text" id="calle" name="calle" placeholder="Calle / Via"
+													required>
+											</p>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<p>
+													<label for="numero">Número</label>
+													<input type="text" id="numero" name="numero" placeholder="Número"
+														required>
+												</p>
+											</div>
+											<div class="col-md-6">
+												<p>
+													<label for="piso">Piso</label>
+													<input type="text" id="piso" name="piso" placeholder="Piso, Puerta">
+												</p>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<p>
+													<label for="cp">Código postal</label>
+													<input type="text" id="cp" name="cp" placeholder="Código postal"
+														required>
+												</p>
+											</div>
+											<div class="col-md-6">
+												<p>
+													<label for="localidad">Localidad</label>
+													<input type="text" id="localidad" name="localidad"
+														placeholder="Localidad" required>
+												</p>
+											</div>
+										</div>
+										<p lcass="mt-2">
+											<input type="checkbox" id="pordefecto" name="pordefecto">
+											<label for="pordefecto">Establecer cómo dirección por defecto</label>
+										</p>
+									</div>
+									<p class="botones_fd d-flex justify-content-center gap-3 mt-4">
+										<a th:href="@{/platos/order}" class="btn btn-dark button-custom-width btn-pos">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+												fill="currentColor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16">
+												<path fill-rule="evenodd"
+													d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5" />
+											</svg>
+											Atrás
+										</a>
+										<button type="submit" id="continuarBtn"
+											class="btn btn-dark button-custom-width btn-pos"
+											th:attr="disabled=${pordefecto == true}">
+											Continuar
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+												fill="currentColor" class="bi bi-arrow-bar-right" viewBox="0 0 16 16">
+												<path fill-rule="evenodd"
+													d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8m-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5" />
+											</svg>
+										</button>
+									</p>
+								</form>
+							</div>
+							<div class="col-2"></div>
+						</div>
+						<div class="col-lg-3"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{public/navigation::footer}"></th:block>
+	
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+	<script>		
+		$("#confirmarDir").on("change", function () {
+			if (this.checked) {				
+				$("#cliente").attr("required", false);
+				$("#calle").attr("required", false);
+				$("#numero").attr("required", false);
+				$("#cp").attr("required", false);
+				$("#localidad").attr("required", false);
+				$("#dir").addClass("d-none"); 
+				$("#continuarBtn").attr("disabled", false);
+			} else {				
+				$("#cliente").attr("required", true);
+				$("#calle").attr("required", true);
+				$("#numero").attr("required", true);
+				$("#cp").attr("required", true);
+				$("#localidad").attr("required", true);
+				$("#continuarBtn").attr("disabled", true);
+			}
+		});
+		
+		$("#cambiarDireccion").on("click", function () {			
+			$("#dir").removeClass("d-none");		
+			$("#confirmarDir").prop("checked", false);
+			$("#cliente").attr("required", true);
+			$("#calle").attr("required", true);
+			$("#numero").attr("required", true);
+			$("#cp").attr("required", true);
+			$("#localidad").attr("required", true);
+			$("#continuarBtn").attr("disabled", false);
+		});
+		
+		document.querySelector('form').addEventListener('submit', function (e) {
+			const confirmarDirCheckbox = document.getElementById('confirmarDir');
+	        const postalCode = document.getElementById('cp').value;	
+	        if (!confirmarDirCheckbox.checked) {
+				 if (!postalCode.startsWith('33') || postalCode.length !== 5) {	          
+		            e.preventDefault();  
+		            Swal.fire({
+		                icon: 'error',
+		                title: 'Código postal incorrecto',
+		                text: 'El código postal debe comenzar con "33" y tener 5 caracteres.',
+		                confirmButtonText: 'Entendido'
+		            });
+		        }
+			}	       
+	    });
+	</script>
+
+</body>
+</html>

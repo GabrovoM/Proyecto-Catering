@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Detalles Menú</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+</head>
+
+<body id="page-top">
+	<div class="container" id="contenido">
+		<h1 class="text-center mb-5">Gestión de contenidos</h1>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item ">
+				<a th:href="@{/admin}">Panel principal</a>
+			</li>
+			<li class="breadcrumb-item" sec:authorize="hasRole('ADMIN') or hasRole('EDITOR')">
+				<a th:if="${nombre != null}" th:href="@{'/admin/menus?nombre=' + ${nombre}}">Menús</a>
+				<a th:if="${nombre == null}" th:href="@{'/admin/menus?page=' + ${page}}">Menús</a>
+			</li>
+			<li class="breadcrumb-item active">Detalles</li>
+		</ol>
+		<div class="row">
+			<div class="col-md-4">
+			</div>
+			<div class="col-md-8">
+				<h2 class="product-name" th:text=${menu.nombre}>Nombre del
+					menu</h2>
+				<div class="product-price">
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+			<p th:text="${errorMessage}"></p>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		<div class="row table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Día</th>
+						<th>Orden</th>
+						<th>Nombre</th>
+						<th>Imagen</th>
+						<th>Precio</th>
+						<th>Disponible</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="plato, iterStat : ${menu.platos}">
+						<td th:if="${iterStat.index == 0 || (menu.platos[iterStat.index - 1].dia != plato.dia)}"
+							th:text="${plato.dia}">Day</td>
+						<td th:unless="${iterStat.index == 0 || (menu.platos[iterStat.index - 1].dia != plato.dia)}">
+						</td>
+						<td>
+							<span th:switch="${plato.orden}">
+								<span th:case="1" class="badge bg-secondary">Primer plato</span>
+								<span th:case="2" class="badge bg-primary">Segundo plato</span>
+							</span>
+						</td>
+						<td th:text="${plato.plato.nombre}">Nombre</td>
+						<td>
+							<img src="#" class="img_plato_menu"
+								th:src="${plato.plato.imagen != null && !plato.plato.imagen.isEmpty() ? '/images/' + plato.plato.imagen : '/images/default.jpg'}"
+								alt="Imagen de plato" style="width: 150px; height: auto;">
+						</td>
+						<td
+							th:text="${plato.plato.precio_of > 0 ? #numbers.formatDecimal(plato.plato.precio_of, 1, 2) : #numbers.formatDecimal(plato.plato.precio, 1, 2)} + ' €'">
+						</td>
+						<td class="text-center"><span th:text="${plato.plato.noDisponible ? 'NO' : ''}"></span></td>
+						<td>
+							<a th:href="@{/admin/menus/cambiarplato/{menuId}/{platoId}(
+					                menuId=${menu.id}, 
+					                platoId=${plato.plato.id}, 
+					                returnUrl='detail_menu', 
+					                dia=${plato.dia})}" class="btn btn-custom-warning">
+								Cambiar Plato
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p><span>Precio total: </span><span th:text="${#numbers.formatDecimal(menu.precio, 1, 2)} + ' €'"></span></p>
+		<a th:if="${nombre != null}" th:href="@{'/admin/menus?nombre=' + ${nombre}}" class="btn btn-primary">Volver a
+			Menús</a>
+		<a th:if="${nombre == null}" th:href="@{'/admin/menus?page=' + ${page}}" class="btn btn-primary">Volver a
+			Menús</a>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+</body>
+
+</html>

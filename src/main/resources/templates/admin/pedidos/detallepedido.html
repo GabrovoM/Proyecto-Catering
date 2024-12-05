@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<title>Detalle pedido</title>
+	<link href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/favicon.png" sizes="64x64">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles_admin.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+	<h1 class="text-center mb-5">Gestión de contenidos</h1>
+	<div th:insert="~{admin/fragmentos::horizontal-nav}"></div>
+	<div class="container-fluid">
+		<div class="sidebar-container col-3 d-none d-md-block fixed-sidebar">
+			<div th:insert="~{admin/fragmentos::vertical-nav}"></div>
+		</div>
+		<div class="col-9 content-area">
+			<ol class="breadcrumb mb-3">
+				<li class="breadcrumb-item" sec:authorize="hasRole('USER')"><a th:href="@{/}">Home</a></li>
+				<li class="breadcrumb-item" sec:authorize="hasRole('USER')">
+					<a th:href="@{/usuario/compras}">Compras</a>
+				</li>
+				<li class="breadcrumb-item" sec:authorize="hasRole('ADMIN') or hasRole('GESTOR')">
+					<a th:href="${refererUrl}">Volver a pedidos</a>
+				</li>
+				<li class="breadcrumb-item active">Detalle de Compra</li>
+			</ol>
+			<h2 class="mb-5">Detalles del pedido <span th:text="${pedido.numero}"></span></h2>
+			<div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show">
+				<p th:text="${errorMessage}"></p>
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+			<div class="row">
+				<div class="col-md-8">
+					<p>ID Pedido: <span th:text="${pedido.id}"></span></p>
+					<p>Cliente: <span th:text="${pedido.usuario.nombre}"></span></p>
+					<p>Dirección: <span
+							th:text="${pedido.direccion+' '+pedido.num+' '+pedido.piso+', '+pedido.localidad+' '+pedido.cp}"></span>
+					</p>
+					<p>Estado pedido: <span class="estado" th:text="${pedido.estadoEnum}"></span> </p>
+					<p>Fecha creación pedido: <span
+							th:utext="${#temporals.format(pedido.fechaCreacion, 'dd/MM/yyyy')}"></span> </p>
+					<p th:if="${pedido.estadoEnum.name() != 'PARCIAL' and pedido.fechaPrimerEnvio ==null}">
+						Fecha entrega aproximada:
+						<span th:utext="${#temporals.format(fechaEntrega, 'dd/MM/yyyy')}"></span>
+					</p>
+					<p th:if="${pedido.estadoEnum.name() == 'FINALIZADO'}">
+						<span
+							th:text="${pedido.fechaPrimerEnvio == null ? 'Fecha envio :' : 'Fecha último envio :' }"></span>
+						<span th:utext="${#temporals.format(fechaEnvio, 'dd/MM/yyyy')}"></span>
+					</p>
+					<p th:if="${pedido.estadoEnum.name() == 'PARCIAL'}">
+						Envio desde fecha: <span
+							th:utext="${#temporals.format(pedido.fechaPrimerEnvio, 'dd/MM/yyyy')}"></span> </p>
+				</div>
+				<div class="col-md-4 d-flex flex-column justify-content-end mb-3">
+					<form th:if="${pedido.estadoEnum.name() != 'FINALIZADO' && pedido.estadoEnum.name() != 'CANCELADO'}"
+						th:action="@{/admin/pedidos/cancelar/{id}(id=${pedido.id})}" method="post">
+						<button class="btn btn-danger btn-sm align-right">
+							Cancelar pedido
+						</button>
+					</form>
+				</div>
+			</div>
+			<div class="row" th:if="${pedido.estadoEnum.name() == 'PARCIAL'}">
+				<p><mark>Para establecer la fecha del envío semanal, marca la casilla correspondiente.
+				Aparecerá la fecha actual. Para confirmarla, pulsa el botón 'Confirmar'.</mark></p>
+			</div>
+			<div class="card mb-4">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row table-responsive">
+								<table class="table">
+									<thead>
+										<tr>
+											<th scope="col">Cantidad</th>
+											<th scope="col">Producto</th>
+											<th scope="col">Precio</th>
+											<th scope="col">Total</th>
+											<th scope="col"
+												th:if="${pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL'}">
+												Envío semanal</th>
+											<th scope="col"
+												th:if="${pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL'}">
+												Fecha</th>
+											<th scope="col"
+												th:if="${pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL'}">
+												Confirmar</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="detalle : ${detalles}">
+											<td th:text="${detalle.cantidad}"></td>
+											<td>
+												<span th:if="${detalle.plato.id != 0}"
+													th:text="${detalle.plato.nombre}"></span>
+												<span th:if="${detalle.menu.id != 0}"
+													th:text="${detalle.menu.nombre}"></span>
+											</td>
+											<td>
+												<span th:if="${detalle.plato.id != 0}"
+													th:text="${detalle.plato.precio_of > 0 ? #numbers.formatDecimal(detalle.plato.precio_of, 1, 2) : #numbers.formatDecimal(detalle.plato.precio, 1, 2)} + ' €'"></span>
+												<span th:if="${detalle.menu.id != 0}"
+													th:text="${#numbers.formatDecimal(detalle.precio_menu,1,2)} + ' €'"></span>
+											</td>
+											<td th:text="${#numbers.formatDecimal(detalle.totalLinea,1,2)} + ' €'"></td>
+											<form th:action="@{/admin/pedidos/confirmar/{id}(id=${detalle.id})}"
+												method="post">
+												<input type="hidden" name="refererUrl" th:value="${refererUrl}">
+												<td
+													th:if="${pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL'}">
+													<input type="checkbox" class="checkbox" name="marcado"
+														th:checked="${detalle.fechaEnvioSemanal != null}">
+												</td>
+												<td class="date-cell"
+													th:if="${pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL'}">
+													<input type="hidden" id="fechaEnvioSemanal" name="fechaEnvioSemanal"
+														th:value="${detalle.fechaEnvioSemanal != null ? #temporals.format(detalle.fechaEnvioSemanal, 'yyyy-MM-dd') : ''}">
+													<span
+														th:text="${detalle.fechaEnvioSemanal != null ? #temporals.format(detalle.fechaEnvioSemanal, 'dd/MM/yyyy') : '-'}"></span>
+												</td>
+												<td class="date-cell"
+													th:if="${pedido.estadoEnum != null && pedido.estadoEnum.name() == 'PARCIAL'}">
+													<button type="submit" class="btn btn-primary"
+														id="confirmButton">Confirmar</button>
+												</td>
+											</form>
+										</tr>
+									</tbody>
+									<tfoot>
+										<tr class="tfoot-row">
+											<td colspan="3" class="text-left">Precio total de pedido: </td>
+											<td th:text="${#numbers.formatDecimal(detallePrecio,1,2)} + ' €'"></td>
+										</tr>
+										<tr class="tfoot-row">
+											<td colspan="3" class="text-left">Precio envío: </td>
+											<td th:text="${#numbers.formatDecimal(precioEnvio,1,2)} + ' €'"></td>
+										</tr>
+										<tr class="tfoot-row">
+											<td colspan="3" class="text-left">Total: </td>
+											<td th:text="${#numbers.formatDecimal((detallePrecio ?: 0) + (precioEnvio ?: 0), 1, 2) + ' €'}"></td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							<div class="d-flex justify-content-between">
+								<a th:href="@{/usuario/generar-pdf/{id}(id=${pedido.id})}"
+									th:if="${pedido.estadoEnum.name() == 'FINALIZADO'}"
+									class="btn btn-custom-primary">Generar
+									factura</a>
+								<a class="btn btn-dark ms-auto mt-4"
+									th:if="${pedido.estadoEnum != null && pedido.estadoEnum.name() != 'FINALIZADO' && pedido.estadoEnum.name() != 'CANCELADO'}"
+									th:onclick="'finalizarPedido(event, ' + ${pedido.id} + ', ' + ${cPage} + ')'"
+									th:href="@{/admin/pedidos/finalizar/{id}(id=${pedido.id}, fechaInicioStr=${param.fechaInicioStr}, fechaFinStr=${param.fechaFinStr}, estado=${pedido.estadoEnum.name()})}">
+									Finalizar pedido
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block th:insert="~{admin/fragmentos::footer}"></th:block>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+	<script th:src="@{/js/app.js}"></script>
+
+	<script>
+		$(document).ready(function () {
+			$('.checkbox').on('change', function () {
+				var currentDate = new Date().toISOString().split('T')[0];
+				var fechaInput = $(this).closest('tr').find('#fechaEnvioSemanal');
+				var dateCell = $(this).closest('td').next('.date-cell').find('span');
+				if ($(this).is(':checked')) {
+					fechaInput.val(currentDate);
+					dateCell.text(new Date().toLocaleDateString());
+				} else {
+					fechaInput.val('');
+					dateCell.text('-');
+				}
+			});
+		});
+
+		function finalizarPedido(event, id, page) {
+			event.preventDefault();
+			page = page || 0;
+			fetch(`/admin/pedidos/finalizar/check/${id}`)
+				.then(response => {
+					if (!response.ok) {
+						return response.text().then(text => {
+							Swal.fire({
+								icon: 'error',
+								title: 'Aviso',
+								text: text,
+								confirmButtonText: 'Aceptar'
+							});
+						});
+					}
+					window.location.href = `/admin/pedidos/finalizar/${id}?page=${page}`;
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					Swal.fire({
+						icon: 'error',
+						title: 'Error',
+						text: 'Error.',
+						confirmButtonText: 'Aceptar'
+					});
+				});
+		}
+
+	</script>
+</body>
+
+</html>
